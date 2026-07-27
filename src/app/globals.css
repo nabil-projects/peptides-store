@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f7f4;
-  --foreground: #151713;
+  --background: #f7f7f7;
+  --foreground: #0b0b0b;
+  --theme-ink: #0b0b0b;
+  --theme-deep: #2a2a2a;
+  --theme-mid: #707070;
+  --theme-accent: #111111;
+  --theme-accent-dark: #0b0b0b;
+  --theme-accent-soft: #eeeeee;
+  --theme-mist: #f7f7f7;
+  --theme-surface: #ffffff;
+  --theme-warm: #111111;
 }
 
 @theme inline {
@@ -19,4 +28,40 @@ body {
 
 html {
   scroll-behavior: smooth;
+}
+
+.hero-zoom-bg {
+  animation: hero-zoom 13s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+.trust-marquee {
+  animation: trust-marquee 24s linear infinite;
+}
+
+@keyframes hero-zoom {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.11);
+  }
+}
+
+@keyframes trust-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-zoom-bg,
+  .trust-marquee {
+    animation: none;
+  }
 }

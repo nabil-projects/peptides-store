@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
-import { products } from "@/data/products";
+import type { Product } from "@/data/products";
+import { createOrderRecord } from "@/lib/order-store";
+import { getProducts } from "@/lib/product-store";
 import { currencyCode, formatPrice } from "@/lib/money";
 
 type OrderItem = {
@@ -32,7 +34,7 @@ function isEmailConfigured() {
   );
 }
 
-function getOrderItems(order: OrderRequest) {
+function getOrderItems(order: OrderRequest, products: Product[]) {
   return order.items.map((item) => {
     const product = products.find((entry) => entry.id === item.productId);
     return {
@@ -42,13 +44,14 @@ function getOrderItems(order: OrderRequest) {
   });
 }
 
-function buildOrderText(order: OrderRequest) {
-  const lines = getOrderItems(order).map((item) => {
+function buildOrderText(order: OrderRequest, products: Product[]) {
+  const orderItems = getOrderItems(order, products);
+  const lines = orderItems.map((item) => {
     const price = item.product?.price ? formatPrice(item.product.price) : "devis";
     return `- ${item.product?.name ?? "Produit inconnu"} x${item.quantity} (${price})`;
   });
 
-  const total = getOrderItems(order).reduce(
+  const total = orderItems.reduce(
     (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
     0,
   );
@@ -72,8 +75,8 @@ function buildOrderText(order: OrderRequest) {
   ].join("\n");
 }
 
-async function sendOrderEmail(order: OrderRequest) {
-  const text = buildOrderText(order);
+async function sendOrderEmail(order: OrderRequest, products: Product[]) {
+  const text = buildOrderText(order, products);
 
   if (!isEmailConfigured()) {
     console.log(text);
@@ -98,13 +101,13 @@ async function sendOrderEmail(order: OrderRequest) {
   });
 }
 
-async function createStripeCheckout(order: OrderRequest) {
+async function createStripeCheckout(order: OrderRequest, products: Product[]) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.NEXT_PUBLIC_SITE_URL) {
     return null;
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const lineItems = getOrderItems(order)
+  const lineItems = getOrderItems(order, products)
     .filter((item) => item.product && item.product.price > 0)
     .map((item) => ({
       quantity: item.quantity,
@@ -138,6 +141,7 @@ async function createStripeCheckout(order: OrderRequest) {
 
 export async function POST(request: Request) {
   const order = (await request.json()) as OrderRequest;
+  const products = await getProducts();
 
   if (
     !order.customer?.name ||
@@ -153,22 +157,25 @@ export async function POST(request: Request) {
     );
   }
 
-  await sendOrderEmail(order);
+  const storedOrder = await createOrderRecord(order, products);
+  await sendOrderEmail(order, products);
 
   if (order.paymentMethod !== "bank") {
-    const checkoutUrl = await createStripeCheckout(order);
+    const checkoutUrl = await createStripeCheckout(order, products);
     if (checkoutUrl) {
-      return NextResponse.json({ checkoutUrl });
+      return NextResponse.json({ checkoutUrl, orderId: storedOrder.id });
     }
 
     return NextResponse.json({
       message:
         "Commande enregistree. Configure STRIPE_SECRET_KEY et NEXT_PUBLIC_SITE_URL pour activer le paiement carte.",
+      orderId: storedOrder.id,
     });
   }
 
   return NextResponse.json({
     message:
       "Commande enregistree. Les instructions de virement/SEPA seront envoyees par email.",
+    orderId: storedOrder.id,
   });
 }

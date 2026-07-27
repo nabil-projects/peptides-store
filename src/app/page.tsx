@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   BadgeCheck,
   ChevronDown,
@@ -14,8 +13,8 @@ import {
   Trash2,
   Truck,
 } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
-import { categories, products } from "@/data/products";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { categories, defaultProducts, type Product } from "@/data/products";
 import { formatPrice } from "@/lib/money";
 
 type Cart = Record<string, number>;
@@ -28,13 +27,49 @@ const stockLabel = {
   notify: "Sur demande",
 };
 
+const trustMessages = [
+  { icon: Truck, label: "Livraison suivie" },
+  { icon: ShieldCheck, label: "Paiement securise" },
+  { icon: BadgeCheck, label: "Lots verifies" },
+  { icon: Truck, label: "Expedition rapide" },
+  { icon: ShieldCheck, label: "Checkout protege" },
+  { icon: BadgeCheck, label: "Catalogue controle" },
+];
+
 export default function Home() {
   const [cart, setCart] = useState<Cart>({});
   const [category, setCategory] = useState<Category>("Tous");
   const [sort, setSort] = useState<SortMode>("featured");
   const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [status, setStatus] = useState("");
   const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProducts() {
+      try {
+        const response = await fetch("/api/products");
+        const result = await response.json();
+
+        if (isMounted && Array.isArray(result.products)) {
+          setProducts(result.products);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingProducts(false);
+        }
+      }
+    }
+
+    loadProducts();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const visibleProducts = useMemo(() => {
     const normalized = search.trim().toLowerCase();
@@ -58,11 +93,12 @@ export default function Home() {
     () =>
       Object.entries(cart)
         .filter(([, quantity]) => quantity > 0)
-        .map(([productId, quantity]) => ({
-          product: products.find((product) => product.id === productId)!,
-          quantity,
-        })),
-    [cart],
+        .map(([productId, quantity]) => {
+          const product = products.find((entry) => entry.id === productId);
+          return product ? { product, quantity } : null;
+        })
+        .filter((item): item is { product: Product; quantity: number } => Boolean(item)),
+    [cart, products],
   );
 
   const subtotal = cartItems.reduce(
@@ -123,18 +159,23 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f4ef] text-[#171712]">
-      <div className="bg-[#171712] text-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4 py-2 text-xs font-semibold sm:px-6">
-          <span className="inline-flex items-center gap-2">
-            <Truck size={15} /> Livraison suivie
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <ShieldCheck size={15} /> Paiement securise
-          </span>
-          <span className="inline-flex items-center gap-2">
-            <BadgeCheck size={15} /> Lots verifies
-          </span>
+    <main className="min-h-screen bg-[var(--theme-mist)] text-[var(--theme-ink)]">
+      <div className="overflow-hidden bg-[var(--theme-ink)] py-2 text-white">
+        <div className="trust-marquee flex w-max items-center">
+          {[0, 1].map((group) => (
+            <div
+              key={group}
+              className="flex shrink-0 items-center gap-8 px-4 text-xs font-black uppercase tracking-[0.16em] sm:gap-12"
+              aria-hidden={group === 1}
+            >
+              {trustMessages.map(({ icon: Icon, label }) => (
+                <span key={`${group}-${label}`} className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <Icon size={15} className="text-[var(--theme-accent-soft)]" />
+                  {label}
+                </span>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -153,10 +194,13 @@ export default function Home() {
             <a href="#legal" className="hover:text-black">
               Conditions
             </a>
+            <a href="/admin" className="hover:text-black">
+              Admin
+            </a>
           </nav>
           <a
             href="#checkout"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-[#8ca52d] px-4 text-sm font-bold text-white transition hover:bg-[#71861f]"
+            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
           >
             <ShoppingBag size={18} />
             {cartItems.length} article{cartItems.length > 1 ? "s" : ""}
@@ -164,40 +208,73 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="bg-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[0.82fr_1.18fr] lg:py-12">
-          <div className="flex flex-col justify-center">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.2em] text-[#8ca52d]">
+      <section className="relative isolate min-h-[70vh] overflow-hidden bg-[var(--theme-ink)] text-white">
+        <img
+          src="/landing-hyaluronic.jpg"
+          alt=""
+          aria-hidden="true"
+          className="hero-zoom-bg absolute inset-0 -z-20 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(0,0,0,0.9)_0%,rgba(0,0,0,0.66)_42%,rgba(0,0,0,0.24)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-[var(--theme-mist)] via-transparent to-transparent" />
+
+        <div className="mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:py-20">
+          <div className="max-w-3xl">
+            <p className="mb-4 text-xs font-black uppercase tracking-[0.22em] text-white/75">
               Boutique recherche & fitness
             </p>
-            <h1 className="text-4xl font-black leading-tight sm:text-5xl">
+            <h1 className="max-w-3xl text-4xl font-black leading-[1.03] sm:text-6xl lg:text-7xl">
               Catalogue premium avec paiement en ligne.
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-black/65">
-              Une boutique inspiree des catalogues peptides modernes : fiches
-              simples, paniers rapides, prix promotionnels et validation
-              paiement selon le prestataire active.
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
+              Une experience plus elegante pour presenter tes produits, mettre
+              les prix en avant et guider le client rapidement vers le panier.
             </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a
+                href="#boutique"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-black text-black transition hover:bg-neutral-200"
+              >
+                <ShoppingBag size={18} />
+                Voir la boutique
+              </a>
+              <a
+                href="/admin"
+                className="inline-flex h-12 items-center justify-center rounded-md border border-white/40 px-5 text-sm font-black text-white transition hover:bg-white/12"
+              >
+                Admin catalogue
+              </a>
+            </div>
           </div>
-          <div className="relative min-h-[290px] overflow-hidden rounded-md border border-black/10 bg-[#f5f4ef] lg:min-h-[360px]">
-            <Image
-              src="/catalog-hero.png"
-              alt="Produits generiques de laboratoire et nutrition"
-              fill
-              priority
-              className="object-cover"
-            />
+
+          <div className="mt-12 grid max-w-3xl gap-3 text-sm font-bold text-white/82 sm:grid-cols-3">
+            <span className="border-t border-white/25 pt-3">Lots verifies</span>
+            <span className="border-t border-white/25 pt-3">Prix modifiables</span>
+            <span className="border-t border-white/25 pt-3">Photos dynamiques</span>
           </div>
         </div>
+        <a
+          href="https://www.magnific.com/free-photo/close-up-hyaluronic-acid-tratment_22894784.htm"
+          target="_blank"
+          rel="noreferrer"
+          className="absolute bottom-3 right-4 text-[11px] font-semibold text-white/55 transition hover:text-white"
+        >
+          Image by magnific
+        </a>
       </section>
 
       <section id="boutique" className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#8ca52d]">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-accent-dark)]">
               Boutique
             </p>
             <h2 className="mt-1 text-3xl font-black">Tous les produits</h2>
+            {isLoadingProducts ? (
+              <p className="mt-2 text-sm font-semibold text-black/50">
+                Chargement du catalogue...
+              </p>
+            ) : null}
           </div>
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] lg:min-w-[520px]">
             <label className="relative block">
@@ -209,14 +286,14 @@ export default function Home() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Rechercher un produit"
-                className="h-11 w-full rounded-md border border-black/15 bg-white pl-10 pr-3 text-sm outline-none focus:border-[#8ca52d]"
+                className="h-11 w-full rounded-md border border-black/15 bg-white pl-10 pr-3 text-sm outline-none focus:border-[var(--theme-accent-dark)]"
               />
             </label>
             <label className="relative block">
               <select
                 value={sort}
                 onChange={(event) => setSort(event.target.value as SortMode)}
-                className="h-11 appearance-none rounded-md border border-black/15 bg-white px-3 pr-9 text-sm font-semibold outline-none focus:border-[#8ca52d]"
+                className="h-11 appearance-none rounded-md border border-black/15 bg-white px-3 pr-9 text-sm font-semibold outline-none focus:border-[var(--theme-accent-dark)]"
               >
                 <option value="featured">Tri par defaut</option>
                 <option value="price-asc">Prix croissant</option>
@@ -243,8 +320,8 @@ export default function Home() {
                   onClick={() => setCategory(item)}
                   className={`flex h-10 items-center justify-between rounded-md px-3 text-sm font-semibold ${
                     category === item
-                      ? "bg-[#171712] text-white"
-                      : "bg-[#f5f4ef] text-black/70 hover:text-black"
+                      ? "bg-[var(--theme-ink)] text-white"
+                      : "bg-[var(--theme-mist)] text-black/70 hover:text-black"
                   }`}
                 >
                   {item}
@@ -268,14 +345,21 @@ export default function Home() {
                 key={product.id}
                 className="flex min-h-[320px] flex-col rounded-md border border-black/10 bg-white p-4 shadow-sm"
               >
+                <div className="mb-4 aspect-[4/3] overflow-hidden rounded-md bg-[var(--theme-mist)]">
+                  <img
+                    src={product.image || "/catalog-hero.png"}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.14em] text-[#8ca52d]">
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--theme-accent-dark)]">
                       {product.category}
                     </p>
                     <h3 className="mt-2 text-lg font-black">{product.name}</h3>
                   </div>
-                  <span className="rounded-md bg-[#edf3d5] px-2 py-1 text-xs font-black text-[#596925]">
+                  <span className="rounded-md bg-[var(--theme-accent-soft)] px-2 py-1 text-xs font-black text-[var(--theme-deep)]">
                     {product.badge || stockLabel[product.stock]}
                   </span>
                 </div>
@@ -283,7 +367,7 @@ export default function Home() {
                 <div className="mb-4 flex items-center gap-1 text-sm">
                   {product.rating ? (
                     <>
-                      <Star size={16} className="fill-[#d7a72b] text-[#d7a72b]" />
+                      <Star size={16} className="fill-[var(--theme-warm)] text-[var(--theme-warm)]" />
                       <span className="font-bold">{product.rating}</span>
                     </>
                   ) : (
@@ -310,14 +394,14 @@ export default function Home() {
                         {product.price ? formatPrice(product.price) : "Devis"}
                       </p>
                     </div>
-                    <span className="text-xs font-bold text-[#596925]">
+                    <span className="text-xs font-bold text-[var(--theme-deep)]">
                       {stockLabel[product.stock]}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => updateCart(product.id, (cart[product.id] || 0) + 1)}
-                    className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[#171712] px-4 text-sm font-bold text-white transition hover:bg-[#303024]"
+                    className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--theme-ink)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
                   >
                     <Plus size={18} />
                     Ajouter au panier
@@ -399,7 +483,7 @@ export default function Home() {
 
           <form onSubmit={checkout} className="grid gap-4">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#8ca52d]">
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-accent-dark)]">
                 Checkout
               </p>
               <h2 className="mt-1 text-2xl font-black">Informations client</h2>
@@ -412,7 +496,7 @@ export default function Home() {
             </div>
             <Input name="address" label="Adresse de livraison" required />
 
-            <div className="grid gap-3 rounded-md border border-black/10 bg-[#f8f8f4] p-4">
+            <div className="grid gap-3 rounded-md border border-black/10 bg-[var(--theme-mist)] p-4">
               <p className="font-black">Mode de paiement</p>
               <label className="flex items-start gap-3 rounded-md border border-black/10 bg-white p-3">
                 <input
@@ -447,12 +531,12 @@ export default function Home() {
             <button
               type="submit"
               disabled={isSending}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[#8ca52d] px-5 font-black text-white transition hover:bg-[#71861f] disabled:opacity-60"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-5 font-black text-white transition hover:bg-[var(--theme-deep)] disabled:opacity-60"
             >
               <CreditCard size={18} />
               {isSending ? "Preparation..." : "Continuer vers le paiement"}
             </button>
-            {status ? <p className="text-sm font-semibold text-[#596925]">{status}</p> : null}
+            {status ? <p className="text-sm font-semibold text-[var(--theme-deep)]">{status}</p> : null}
           </form>
         </div>
       </section>
@@ -485,7 +569,7 @@ function Input({
         name={name}
         type={type}
         required={required}
-        className="h-12 rounded-md border border-black/15 px-3 font-normal outline-none focus:border-[#8ca52d]"
+        className="h-12 rounded-md border border-black/15 px-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
       />
     </label>
   );

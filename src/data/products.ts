@@ -8,10 +8,11 @@ export type Product = {
   rating?: number;
   stock: "in-stock" | "preorder" | "notify";
   description: string;
+  image?: string;
   badge?: string;
 };
 
-export const products: Product[] = [
+export const defaultProducts: Product[] = [
   {
     id: "reta-research",
     name: "RETA - Recherche",
@@ -22,6 +23,7 @@ export const products: Product[] = [
     rating: 4.7,
     stock: "in-stock",
     description: "Produit destine a la recherche in vitro, controle par lot.",
+    image: "/catalog-hero.png",
     badge: "HPLC",
   },
   {
@@ -34,6 +36,7 @@ export const products: Product[] = [
     rating: 4.9,
     stock: "in-stock",
     description: "Reference laboratoire, disponibilite confirmee au checkout.",
+    image: "/catalog-hero.png",
   },
   {
     id: "bpc-157",
@@ -45,6 +48,7 @@ export const products: Product[] = [
     rating: 4.8,
     stock: "in-stock",
     description: "Usage strictement recherche. Aucune promesse medicale.",
+    image: "/catalog-hero.png",
   },
   {
     id: "tb-500",
@@ -56,6 +60,7 @@ export const products: Product[] = [
     rating: 4.7,
     stock: "in-stock",
     description: "Conditionnement scelle, informations de lot disponibles.",
+    image: "/catalog-hero.png",
   },
   {
     id: "pack-synergie",
@@ -67,6 +72,7 @@ export const products: Product[] = [
     rating: 4.8,
     stock: "in-stock",
     description: "Pack de references selectionnees pour commande groupee.",
+    image: "/catalog-hero.png",
     badge: "Pack",
   },
   {
@@ -79,6 +85,7 @@ export const products: Product[] = [
     rating: 4.8,
     stock: "preorder",
     description: "Pack disponible en precommande selon arrivage.",
+    image: "/catalog-hero.png",
   },
   {
     id: "bacteriostatic-water",
@@ -90,6 +97,7 @@ export const products: Product[] = [
     rating: 4.7,
     stock: "in-stock",
     description: "Accessoire laboratoire, vendu selon disponibilite.",
+    image: "/catalog-hero.png",
   },
   {
     id: "alcohol-swabs",
@@ -101,6 +109,7 @@ export const products: Product[] = [
     rating: 5,
     stock: "preorder",
     description: "Lot de tampons a usage laboratoire.",
+    image: "/catalog-hero.png",
   },
   {
     id: "whey-isolate",
@@ -112,6 +121,7 @@ export const products: Product[] = [
     rating: 4.6,
     stock: "in-stock",
     description: "Proteine sportive, fiche produit a personnaliser.",
+    image: "/catalog-hero.png",
   },
   {
     id: "creatine",
@@ -123,6 +133,7 @@ export const products: Product[] = [
     rating: 4.8,
     stock: "in-stock",
     description: "Supplement nutrition sportive avec description neutre.",
+    image: "/catalog-hero.png",
   },
   {
     id: "shaker-pro",
@@ -134,6 +145,7 @@ export const products: Product[] = [
     rating: 4.6,
     stock: "notify",
     description: "Shaker robuste, retour stock a confirmer.",
+    image: "/catalog-hero.png",
   },
   {
     id: "custom-request",
@@ -143,8 +155,11 @@ export const products: Product[] = [
     unit: "devis",
     stock: "notify",
     description: "Demande speciale traitee uniquement apres validation.",
+    image: "/catalog-hero.png",
     badge: "Sur demande",
   },
 ];
+
+export const products = defaultProducts;
 
 export const categories = ["Tous", "Peptides", "Accessoires", "Packs", "Nutrition"] as const;
