@@ -3,7 +3,6 @@
 import {
   BadgeCheck,
   ChevronDown,
-  CreditCard,
   Minus,
   PlayCircle,
   Plus,
@@ -21,6 +20,7 @@ import { formatPrice } from "@/lib/money";
 type Cart = Record<string, number>;
 type Category = (typeof categories)[number];
 type SortMode = "featured" | "price-asc" | "price-desc";
+const productsPerPage = 6;
 
 type GuideVideo = {
   id: string;
@@ -50,6 +50,11 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<Product[]>(defaultProducts);
   const [guides, setGuides] = useState<GuideVideo[]>([]);
+  const [productPage, setProductPage] = useState(1);
+  const [orderNotice, setOrderNotice] = useState<{
+    orderId?: string;
+    message: string;
+  } | null>(null);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [status, setStatus] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -95,6 +100,10 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    setProductPage(1);
+  }, [category, products, search, sort]);
+
   const visibleProducts = useMemo(() => {
     const normalized = search.trim().toLowerCase();
     const filtered = products.filter((product) => {
@@ -112,6 +121,17 @@ export default function Home() {
       return 0;
     });
   }, [category, search, sort]);
+
+  const totalProductPages = Math.max(1, Math.ceil(visibleProducts.length / productsPerPage));
+  const safeProductPage = Math.min(productPage, totalProductPages);
+  const paginatedProducts = visibleProducts.slice(
+    (safeProductPage - 1) * productsPerPage,
+    safeProductPage * productsPerPage,
+  );
+  const productRangeStart = visibleProducts.length
+    ? (safeProductPage - 1) * productsPerPage + 1
+    : 0;
+  const productRangeEnd = Math.min(safeProductPage * productsPerPage, visibleProducts.length);
 
   const cartItems = useMemo(
     () =>
@@ -138,6 +158,7 @@ export default function Home() {
 
   async function checkout(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const checkoutForm = event.currentTarget;
     setStatus("");
 
     if (!cartItems.length) {
@@ -145,14 +166,14 @@ export default function Home() {
       return;
     }
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(checkoutForm);
     setIsSending(true);
 
     const response = await fetch("/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        paymentMethod: form.get("paymentMethod"),
+        paymentMethod: "bank",
         customer: {
           name: form.get("name"),
           phone: form.get("phone"),
@@ -170,20 +191,46 @@ export default function Home() {
     const result = await response.json();
     setIsSending(false);
 
-    if (result.checkoutUrl) {
-      window.location.href = result.checkoutUrl;
-      return;
-    }
-
     setStatus(result.message);
     if (response.ok) {
+      setOrderNotice({
+        orderId: result.orderId,
+        message:
+          result.message ||
+          "Commande confirmee. Le vendeur te contactera pour les instructions de virement.",
+      });
       setCart({});
-      event.currentTarget.reset();
+      checkoutForm.reset();
     }
   }
 
   return (
     <main className="min-h-screen bg-[var(--theme-mist)] text-[var(--theme-ink)]">
+      {orderNotice ? (
+        <div className="fixed inset-x-0 top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-xl rounded-md border border-black/10 bg-white p-4 shadow-2xl">
+          <div className="flex items-start gap-3">
+            <BadgeCheck className="mt-0.5 shrink-0 text-black" size={22} />
+            <div className="min-w-0 flex-1">
+              <p className="font-black">Commande bien passee</p>
+              <p className="mt-1 text-sm leading-6 text-black/65">{orderNotice.message}</p>
+              {orderNotice.orderId ? (
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-black/45">
+                  Reference {orderNotice.orderId}
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => setOrderNotice(null)}
+              className="grid size-8 shrink-0 place-items-center rounded-md border border-black/15 text-sm font-black"
+              aria-label="Fermer"
+            >
+              x
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <div className="overflow-hidden bg-[var(--theme-ink)] py-2 text-white">
         <div className="trust-marquee flex w-max items-center">
           {[0, 1].map((group) => (
@@ -418,12 +465,13 @@ export default function Home() {
             </div>
           </aside>
 
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {visibleProducts.map((product) => (
-              <article
-                key={product.id}
-                className="flex min-h-[320px] flex-col rounded-md border border-black/10 bg-white p-4 shadow-sm"
-              >
+          <div className="min-w-0">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {paginatedProducts.map((product) => (
+                <article
+                  key={product.id}
+                  className="flex min-h-[320px] flex-col rounded-md border border-black/10 bg-white p-4 shadow-sm"
+                >
                 <div className="mb-4 aspect-[4/3] overflow-hidden rounded-md bg-[var(--theme-mist)]">
                   <img
                     src={product.image || "/catalog-hero.png"}
@@ -486,8 +534,36 @@ export default function Home() {
                     Ajouter au panier
                   </button>
                 </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-col gap-3 rounded-md border border-black/10 bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm font-semibold text-black/55">
+                {productRangeStart}-{productRangeEnd} sur {visibleProducts.length} produits
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setProductPage((page) => Math.max(1, page - 1))}
+                  disabled={safeProductPage === 1}
+                  className="h-10 rounded-md border border-black/15 px-3 text-sm font-black disabled:opacity-40"
+                >
+                  Precedent
+                </button>
+                <span className="grid h-10 min-w-10 place-items-center rounded-md bg-black px-3 text-sm font-black text-white">
+                  {safeProductPage}/{totalProductPages}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setProductPage((page) => Math.min(totalProductPages, page + 1))}
+                  disabled={safeProductPage === totalProductPages}
+                  className="h-10 rounded-md border border-black/15 px-3 text-sm font-black disabled:opacity-40"
+                >
+                  Suivant
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -575,36 +651,13 @@ export default function Home() {
             </div>
             <Input name="address" label="Adresse de livraison" required />
 
-            <div className="grid gap-3 rounded-md border border-black/10 bg-[var(--theme-mist)] p-4">
-              <p className="font-black">Mode de paiement</p>
-              <label className="flex items-start gap-3 rounded-md border border-black/10 bg-white p-3">
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="card"
-                  defaultChecked
-                  className="mt-1"
-                />
-                <span>
-                  <span className="flex items-center gap-2 font-bold">
-                    <CreditCard size={18} /> Carte bancaire via Stripe
-                  </span>
-                  <span className="mt-1 block text-sm text-black/55">
-                    Redirection vers une page de paiement securisee apres
-                    validation. Necessite un compte marchand approuve.
-                  </span>
-                </span>
-              </label>
-              <label className="flex items-start gap-3 rounded-md border border-black/10 bg-white p-3">
-                <input type="radio" name="paymentMethod" value="bank" className="mt-1" />
-                <span>
-                  <span className="font-bold">Virement / SEPA</span>
-                  <span className="mt-1 block text-sm text-black/55">
-                    Commande enregistree, instructions de paiement envoyees par
-                    email.
-                  </span>
-                </span>
-              </label>
+            <div className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-4">
+              <p className="font-black">Paiement par virement / SEPA</p>
+              <p className="mt-2 text-sm leading-6 text-black/60">
+                Apres validation, la commande est enregistree avec le statut
+                paiement en attente. Les instructions de virement seront
+                envoyees par email ou confirmees directement par le vendeur.
+              </p>
             </div>
 
             <button
@@ -612,8 +665,8 @@ export default function Home() {
               disabled={isSending}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-5 font-black text-white transition hover:bg-[var(--theme-deep)] disabled:opacity-60"
             >
-              <CreditCard size={18} />
-              {isSending ? "Preparation..." : "Continuer vers le paiement"}
+              <ShieldCheck size={18} />
+              {isSending ? "Preparation..." : "Confirmer la commande"}
             </button>
             {status ? <p className="text-sm font-semibold text-[var(--theme-deep)]">{status}</p> : null}
           </form>

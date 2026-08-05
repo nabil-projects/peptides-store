@@ -5,10 +5,10 @@ import type { Product } from "@/data/products";
 const dataDir = path.join(process.cwd(), "data");
 const ordersFile = path.join(dataDir, "orders.json");
 
-export type OrderStatus = "new" | "pending_payment" | "paid" | "processing" | "shipped" | "cancelled";
+export type OrderStatus = "pending_payment" | "paid" | "cancelled";
 
 export type OrderInput = {
-  paymentMethod?: "card" | "bank";
+  paymentMethod?: "bank";
   customer: {
     name: string;
     phone: string;
@@ -28,7 +28,7 @@ export type StoredOrder = {
   createdAt: string;
   updatedAt: string;
   status: OrderStatus;
-  paymentMethod: "card" | "bank";
+  paymentMethod: "bank";
   customer: OrderInput["customer"];
   items: Array<{
     productId: string;
@@ -43,11 +43,8 @@ export type StoredOrder = {
 };
 
 const orderStatuses: OrderStatus[] = [
-  "new",
   "pending_payment",
   "paid",
-  "processing",
-  "shipped",
   "cancelled",
 ];
 
@@ -55,7 +52,7 @@ export async function getOrders() {
   try {
     const raw = await readFile(ordersFile, "utf8");
     const parsed = JSON.parse(raw) as StoredOrder[];
-    return parsed.filter(isStoredOrder);
+    return parsed.map(normalizeStoredOrder).filter(Boolean) as StoredOrder[];
   } catch {
     return [];
   }
@@ -82,8 +79,8 @@ export async function createOrderRecord(order: OrderInput, products: Product[]) 
     id: `ORD-${Date.now()}`,
     createdAt: now,
     updatedAt: now,
-    status: order.paymentMethod === "card" ? "pending_payment" : "new",
-    paymentMethod: order.paymentMethod === "bank" ? "bank" : "card",
+    status: "pending_payment",
+    paymentMethod: "bank",
     customer: {
       name: String(order.customer.name || "").trim(),
       phone: String(order.customer.phone || "").trim(),
@@ -140,12 +137,23 @@ async function saveOrders(orders: StoredOrder[]) {
   await writeFile(ordersFile, `${JSON.stringify(orders, null, 2)}\n`, "utf8");
 }
 
-function isStoredOrder(order: StoredOrder) {
-  return Boolean(
-    order?.id &&
-      order.createdAt &&
-      order.customer?.name &&
-      Array.isArray(order.items) &&
-      orderStatuses.includes(order.status),
-  );
+function normalizeStoredOrder(order: StoredOrder) {
+  if (!order?.id || !order.createdAt || !order.customer?.name || !Array.isArray(order.items)) {
+    return null;
+  }
+
+  const status = normalizeStatus(order.status);
+  return {
+    ...order,
+    status,
+    paymentMethod: "bank",
+  } satisfies StoredOrder;
+}
+
+function normalizeStatus(status: string): OrderStatus {
+  if (status === "paid" || status === "cancelled") {
+    return status;
+  }
+
+  return "pending_payment";
 }

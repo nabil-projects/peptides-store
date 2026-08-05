@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import Stripe from "stripe";
 import type { Product } from "@/data/products";
 import { createOrderRecord } from "@/lib/order-store";
 import { getProducts } from "@/lib/product-store";
-import { currencyCode, formatPrice } from "@/lib/money";
+import { formatPrice } from "@/lib/money";
 
 type OrderItem = {
   productId: string;
@@ -12,7 +11,7 @@ type OrderItem = {
 };
 
 type OrderRequest = {
-  paymentMethod?: "card" | "bank";
+  paymentMethod?: "bank";
   customer: {
     name: string;
     phone: string;
@@ -59,7 +58,7 @@ function buildOrderText(order: OrderRequest, products: Product[]) {
   return [
     "Nouvelle commande",
     "",
-    `Paiement: ${order.paymentMethod === "bank" ? "Virement / SEPA" : "Carte bancaire"}`,
+    "Paiement: Virement / SEPA",
     `Total produits: ${formatPrice(total)}`,
     "",
     `Nom: ${order.customer.name}`,
@@ -101,46 +100,11 @@ async function sendOrderEmail(order: OrderRequest, products: Product[]) {
   });
 }
 
-async function createStripeCheckout(order: OrderRequest, products: Product[]) {
-  if (!process.env.STRIPE_SECRET_KEY || !process.env.NEXT_PUBLIC_SITE_URL) {
-    return null;
-  }
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  const lineItems = getOrderItems(order, products)
-    .filter((item) => item.product && item.product.price > 0)
-    .map((item) => ({
-      quantity: item.quantity,
-      price_data: {
-        currency: currencyCode,
-        unit_amount: item.product!.price * 100,
-        product_data: {
-          name: item.product!.name,
-          description: item.product!.unit,
-        },
-      },
-    }));
-
-  if (!lineItems.length) return null;
-
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: order.customer.email || undefined,
-    line_items: lineItems,
-    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/?payment=success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/?payment=cancel`,
-    metadata: {
-      customerName: order.customer.name,
-      customerPhone: order.customer.phone,
-      customerCity: order.customer.city || "",
-    },
-  });
-
-  return session.url;
-}
-
 export async function POST(request: Request) {
-  const order = (await request.json()) as OrderRequest;
+  const order = {
+    ...((await request.json()) as OrderRequest),
+    paymentMethod: "bank" as const,
+  };
   const products = await getProducts();
 
   if (
@@ -160,22 +124,9 @@ export async function POST(request: Request) {
   const storedOrder = await createOrderRecord(order, products);
   await sendOrderEmail(order, products);
 
-  if (order.paymentMethod !== "bank") {
-    const checkoutUrl = await createStripeCheckout(order, products);
-    if (checkoutUrl) {
-      return NextResponse.json({ checkoutUrl, orderId: storedOrder.id });
-    }
-
-    return NextResponse.json({
-      message:
-        "Commande enregistree. Configure STRIPE_SECRET_KEY et NEXT_PUBLIC_SITE_URL pour activer le paiement carte.",
-      orderId: storedOrder.id,
-    });
-  }
-
   return NextResponse.json({
     message:
-      "Commande enregistree. Les instructions de virement/SEPA seront envoyees par email.",
+      "Commande enregistree. Les instructions de virement/SEPA seront envoyees par email ou confirmees par le vendeur.",
     orderId: storedOrder.id,
   });
 }

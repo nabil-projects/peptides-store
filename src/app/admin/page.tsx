@@ -10,6 +10,7 @@ import {
   PlayCircle,
   Plus,
   Save,
+  Search,
   Trash2,
   Upload,
 } from "lucide-react";
@@ -24,14 +25,14 @@ type FormState = Omit<Product, "id" | "oldPrice" | "rating" | "badge"> & {
   badge: string;
 };
 
-type OrderStatus = "new" | "pending_payment" | "paid" | "processing" | "shipped" | "cancelled";
+type OrderStatus = "pending_payment" | "paid" | "cancelled";
 
 type StoredOrder = {
   id: string;
   createdAt: string;
   updatedAt: string;
   status: OrderStatus;
-  paymentMethod: "card" | "bank";
+  paymentMethod: "bank";
   customer: {
     name: string;
     phone: string;
@@ -91,11 +92,8 @@ const stockOptions = [
 ] as const;
 
 const orderStatuses: Array<{ value: OrderStatus; label: string }> = [
-  { value: "new", label: "Nouvelle" },
-  { value: "pending_payment", label: "Paiement attente" },
+  { value: "pending_payment", label: "Paiement en attente" },
   { value: "paid", label: "Payee" },
-  { value: "processing", label: "Preparation" },
-  { value: "shipped", label: "Expediee" },
   { value: "cancelled", label: "Annulee" },
 ];
 
@@ -112,6 +110,7 @@ export default function AdminPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"orders" | "guides" | "products">("orders");
+  const [productSearch, setProductSearch] = useState("");
   const [status, setStatus] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -125,6 +124,24 @@ export default function AdminPage() {
     () => products.find((product) => product.id === selectedId),
     [products, selectedId],
   );
+
+  const filteredProducts = useMemo(() => {
+    const normalizedSearch = productSearch.trim().toLowerCase();
+
+    if (!normalizedSearch) {
+      return products;
+    }
+
+    return products.filter((product) =>
+      [
+        product.name,
+        product.category,
+        product.unit,
+        product.description,
+        product.badge || "",
+      ].some((value) => value.toLowerCase().includes(normalizedSearch)),
+    );
+  }, [productSearch, products]);
 
   useEffect(() => {
     checkSession();
@@ -487,14 +504,16 @@ export default function AdminPage() {
             </a>
             <h1 className="mt-2 text-3xl font-black">Admin BIP PEPTIDE</h1>
           </div>
-          <button
-            type="button"
-            onClick={activeTab === "guides" ? resetGuideForm : resetForm}
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-ink)] px-4 text-sm font-bold text-white"
-          >
-            {activeTab === "guides" ? <PlayCircle size={18} /> : <PackagePlus size={18} />}
-            {activeTab === "guides" ? "Nouveau guide" : "Nouveau produit"}
-          </button>
+          {activeTab === "products" ? (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-ink)] px-4 text-sm font-bold text-white"
+            >
+              <PackagePlus size={18} />
+              Nouveau produit
+            </button>
+          ) : null}
         </div>
       </header>
 
@@ -561,13 +580,29 @@ export default function AdminPage() {
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--theme-accent-dark)]">
                 Produits
               </p>
-              <h2 className="text-xl font-black">{products.length} references</h2>
+              <h2 className="text-xl font-black">
+                {filteredProducts.length} / {products.length} references
+              </h2>
             </div>
             <BadgeEuro className="text-[var(--theme-accent-dark)]" size={26} />
           </div>
 
+          <label className="relative mb-4 block">
+            <Search
+              size={18}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/45"
+            />
+            <input
+              value={productSearch}
+              onChange={(event) => setProductSearch(event.target.value)}
+              placeholder="Rechercher par nom, categorie, unite..."
+              className="h-11 w-full rounded-md border border-black/15 bg-white pl-10 pr-3 text-sm font-semibold outline-none transition focus:border-[var(--theme-accent-dark)]"
+              aria-label="Rechercher un produit"
+            />
+          </label>
+
           <div className="grid gap-3">
-            {products.map((product) => (
+            {filteredProducts.length ? filteredProducts.map((product) => (
               <article
                 key={product.id}
                 className={`grid gap-3 rounded-md border p-3 sm:grid-cols-[82px_1fr_auto] ${
@@ -607,7 +642,11 @@ export default function AdminPage() {
                   </button>
                 </div>
               </article>
-            ))}
+            )) : (
+              <p className="rounded-md border border-dashed border-black/15 p-4 text-sm font-semibold text-black/55">
+                Aucun produit trouve.
+              </p>
+            )}
           </div>
         </section>
 
@@ -962,7 +1001,7 @@ function OrdersPanel({
                     </div>
                     <div className="rounded-md bg-[var(--theme-mist)] p-3 text-sm leading-6">
                       <p className="font-black">Paiement</p>
-                      <p>{order.paymentMethod === "bank" ? "Virement / SEPA" : "Carte bancaire"}</p>
+                      <p>Virement / SEPA</p>
                       <p>Sous-total: {formatPrice(order.subtotal)}</p>
                       <p>Livraison: {order.shipping ? formatPrice(order.shipping) : "Offerte"}</p>
                       <p className="font-black">Total: {formatPrice(order.total)}</p>

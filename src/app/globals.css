@@ -30,6 +30,18 @@ html {
   scroll-behavior: smooth;
 }
 
+button:not(:disabled),
+a[href] {
+  transition-duration: 180ms;
+  transition-property: background-color, border-color, color, opacity, transform;
+  transition-timing-function: ease;
+}
+
+button:not(:disabled):hover,
+a[href]:hover {
+  transform: translateY(-1px);
+}
+
 .hero-zoom-bg {
   animation: hero-zoom 13s ease-in-out infinite alternate;
   transform-origin: center;
