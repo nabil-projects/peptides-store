@@ -1,18 +1,5 @@
 [
   {
-    "id": "reta-research",
-    "name": "RETA - Recherche",
-    "category": "Peptides",
-    "price": 899,
-    "oldPrice": 1189,
-    "unit": "10 mg",
-    "rating": 4.7,
-    "stock": "in-stock",
-    "description": "Produit destine a la recherche in vitro, controle par lot.",
-    "image": "/catalog-hero.png",
-    "badge": "HPLC"
-  },
-  {
     "id": "ghk-cu",
     "name": "GHK-Cu",
     "category": "Peptides",

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LABFIT - Boutique",
-  description: "Boutique fitness avec panier et paiement configurable.",
+  title: "BIP PEPTIDE - Boutique",
+  description: "Boutique BIP PEPTIDE avec catalogue, guide et paiement configurable.",
 };
 
 export default function RootLayout({

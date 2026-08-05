@@ -7,6 +7,7 @@ import {
   ImagePlus,
   PackagePlus,
   Pencil,
+  PlayCircle,
   Plus,
   Save,
   Trash2,
@@ -51,6 +52,19 @@ type StoredOrder = {
   total: number;
 };
 
+type GuideVideo = {
+  id: string;
+  title: string;
+  videoUrl: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type GuideFormState = {
+  title: string;
+  videoUrl: string;
+};
+
 const emptyForm: FormState = {
   name: "",
   category: "Peptides",
@@ -62,6 +76,11 @@ const emptyForm: FormState = {
   description: "",
   image: "/catalog-hero.png",
   badge: "",
+};
+
+const emptyGuideForm: GuideFormState = {
+  title: "",
+  videoUrl: "",
 };
 
 const editableCategories = categories.filter((category) => category !== "Tous");
@@ -87,15 +106,20 @@ const statusLabels = Object.fromEntries(
 export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<StoredOrder[]>([]);
+  const [guides, setGuides] = useState<GuideVideo[]>([]);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [guideForm, setGuideForm] = useState<GuideFormState>(emptyGuideForm);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"orders" | "products">("orders");
+  const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"orders" | "guides" | "products">("orders");
   const [status, setStatus] = useState("");
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSavingGuide, setIsSavingGuide] = useState(false);
+  const [isUploadingGuide, setIsUploadingGuide] = useState(false);
 
   const selectedProduct = useMemo(
     () => products.find((product) => product.id === selectedId),
@@ -115,6 +139,7 @@ export default function AdminPage() {
     setIsCheckingSession(false);
     if (authenticated) {
       await loadOrders();
+      await loadGuides();
     }
   }
 
@@ -138,6 +163,7 @@ export default function AdminPage() {
     setPassword("");
     setStatus("");
     await loadOrders();
+    await loadGuides();
   }
 
   async function loadProducts() {
@@ -156,6 +182,12 @@ export default function AdminPage() {
 
     const result = await response.json();
     setOrders(Array.isArray(result.orders) ? result.orders : []);
+  }
+
+  async function loadGuides() {
+    const response = await fetch("/api/guides");
+    const result = await response.json();
+    setGuides(Array.isArray(result.guides) ? result.guides : []);
   }
 
   async function changeOrderStatus(orderId: string, nextStatus: OrderStatus) {
@@ -221,6 +253,25 @@ export default function AdminPage() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function editGuide(guide: GuideVideo) {
+    setSelectedGuideId(guide.id);
+    setGuideForm({
+      title: guide.title,
+      videoUrl: guide.videoUrl,
+    });
+    setStatus("");
+  }
+
+  function resetGuideForm() {
+    setSelectedGuideId(null);
+    setGuideForm(emptyGuideForm);
+    setStatus("");
+  }
+
+  function updateGuideField<K extends keyof GuideFormState>(key: K, value: GuideFormState[K]) {
+    setGuideForm((current) => ({ ...current, [key]: value }));
+  }
+
   async function uploadImage(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -247,6 +298,34 @@ export default function AdminPage() {
 
     updateField("image", result.url);
     setStatus("Photo ajoutee. Pense a enregistrer le produit.");
+  }
+
+  async function uploadGuideVideo(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const payload = new FormData();
+    payload.append("file", file);
+    setIsUploadingGuide(true);
+    setStatus("");
+
+    const response = await fetch("/api/uploads", {
+      method: "POST",
+      body: payload,
+    });
+    const result = await response.json();
+    setIsUploadingGuide(false);
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
+      setStatus(result.message || "Upload video impossible.");
+      return;
+    }
+
+    updateGuideField("videoUrl", result.url);
+    setStatus("Video ajoutee. Pense a enregistrer le guide.");
   }
 
   async function saveProduct(event: FormEvent<HTMLFormElement>) {
@@ -285,6 +364,35 @@ export default function AdminPage() {
     }
   }
 
+  async function saveGuide(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSavingGuide(true);
+    setStatus("");
+
+    const url = selectedGuideId ? `/api/guides/${selectedGuideId}` : "/api/guides";
+    const response = await fetch(url, {
+      method: selectedGuideId ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(guideForm),
+    });
+    const result = await response.json();
+    setIsSavingGuide(false);
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
+      setStatus(result.message || "Enregistrement du guide impossible.");
+      return;
+    }
+
+    await loadGuides();
+    setStatus(selectedGuideId ? "Guide modifie." : "Guide ajoute.");
+    if (!selectedGuideId) {
+      resetGuideForm();
+    }
+  }
+
   async function removeProduct(product: Product) {
     if (!window.confirm(`Supprimer ${product.name} ?`)) return;
 
@@ -305,6 +413,28 @@ export default function AdminPage() {
       resetForm();
     }
     setStatus("Produit supprime.");
+  }
+
+  async function removeGuide(guide: GuideVideo) {
+    if (!window.confirm(`Supprimer ${guide.title} ?`)) return;
+
+    const response = await fetch(`/api/guides/${guide.id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
+      setStatus("Suppression du guide impossible.");
+      return;
+    }
+
+    await loadGuides();
+    if (selectedGuideId === guide.id) {
+      resetGuideForm();
+    }
+    setStatus("Guide supprime.");
   }
 
   if (!isAuthenticated) {
@@ -355,15 +485,15 @@ export default function AdminPage() {
               <ArrowLeft size={16} />
               Retour boutique
             </a>
-            <h1 className="mt-2 text-3xl font-black">Admin catalogue</h1>
+            <h1 className="mt-2 text-3xl font-black">Admin BIP PEPTIDE</h1>
           </div>
           <button
             type="button"
-            onClick={resetForm}
+            onClick={activeTab === "guides" ? resetGuideForm : resetForm}
             className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-ink)] px-4 text-sm font-bold text-white"
           >
-            <PackagePlus size={18} />
-            Nouveau produit
+            {activeTab === "guides" ? <PlayCircle size={18} /> : <PackagePlus size={18} />}
+            {activeTab === "guides" ? "Nouveau guide" : "Nouveau produit"}
           </button>
         </div>
       </header>
@@ -378,6 +508,16 @@ export default function AdminPage() {
         >
           <ClipboardList size={18} />
           Commandes ({orders.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("guides")}
+          className={`inline-flex h-11 items-center gap-2 rounded-md px-4 text-sm font-black ${
+            activeTab === "guides" ? "bg-black text-white" : "border border-black/15 bg-white"
+          }`}
+        >
+          <PlayCircle size={18} />
+          Guide ({guides.length})
         </button>
         <button
           type="button"
@@ -397,6 +537,21 @@ export default function AdminPage() {
           onStatusChange={changeOrderStatus}
           onDelete={removeOrder}
           onRefresh={loadOrders}
+        />
+      ) : activeTab === "guides" ? (
+        <GuidesPanel
+          guides={guides}
+          form={guideForm}
+          selectedGuideId={selectedGuideId}
+          status={status}
+          isSaving={isSavingGuide}
+          isUploading={isUploadingGuide}
+          onSubmit={saveGuide}
+          onChange={updateGuideField}
+          onEdit={editGuide}
+          onDelete={removeGuide}
+          onReset={resetGuideForm}
+          onUpload={uploadGuideVideo}
         />
       ) : (
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr]">
@@ -456,9 +611,9 @@ export default function AdminPage() {
           </div>
         </section>
 
-        <form onSubmit={saveProduct} className="h-fit rounded-md border border-black/10 bg-white p-4">
-          <div className="mb-5 flex items-start justify-between gap-4">
-            <div>
+        <form onSubmit={saveProduct} className="h-fit min-w-0 rounded-md border border-black/10 bg-white p-4">
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--theme-accent-dark)]">
                 Edition
               </p>
@@ -476,13 +631,13 @@ export default function AdminPage() {
             </button>
           </div>
 
-          <div className="grid gap-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-5">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <Input label="Nom" value={form.name} onChange={(value) => updateField("name", value)} required />
               <Input label="Unite" value={form.unit} onChange={(value) => updateField("unit", value)} required />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
               <Input
                 label="Prix"
                 type="number"
@@ -505,7 +660,7 @@ export default function AdminPage() {
               />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
               <Select
                 label="Categorie"
                 value={form.category}
@@ -521,24 +676,24 @@ export default function AdminPage() {
               <Input label="Badge" value={form.badge} onChange={(value) => updateField("badge", value)} />
             </div>
 
-            <label className="grid gap-2 text-sm font-bold">
+            <label className="grid min-w-0 gap-2 text-sm font-bold">
               Description
               <textarea
                 value={form.description}
                 onChange={(event) => updateField("description", event.target.value)}
                 required
                 rows={4}
-                className="rounded-md border border-black/15 px-3 py-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
+                className="w-full min-w-0 resize-y rounded-md border border-black/15 px-3 py-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
               />
             </label>
 
-            <div className="grid gap-4 sm:grid-cols-[150px_1fr]">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-[150px_minmax(0,1fr)]">
               <img
                 src={form.image || "/catalog-hero.png"}
                 alt="Apercu produit"
                 className="aspect-square w-full rounded-md border border-black/10 object-cover"
               />
-              <div className="grid content-start gap-3">
+              <div className="grid min-w-0 content-start gap-3">
                 <Input
                   label="URL photo"
                   value={form.image || ""}
@@ -558,6 +713,167 @@ export default function AdminPage() {
       </div>
       )}
     </main>
+  );
+}
+
+function GuidesPanel({
+  guides,
+  form,
+  selectedGuideId,
+  status,
+  isSaving,
+  isUploading,
+  onSubmit,
+  onChange,
+  onEdit,
+  onDelete,
+  onReset,
+  onUpload,
+}: {
+  guides: GuideVideo[];
+  form: GuideFormState;
+  selectedGuideId: string | null;
+  status: string;
+  isSaving: boolean;
+  isUploading: boolean;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onChange: <K extends keyof GuideFormState>(key: K, value: GuideFormState[K]) => void;
+  onEdit: (guide: GuideVideo) => void;
+  onDelete: (guide: GuideVideo) => void;
+  onReset: () => void;
+  onUpload: (event: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  const selectedGuide = guides.find((guide) => guide.id === selectedGuideId);
+
+  return (
+    <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr]">
+      <section className="rounded-md border border-black/10 bg-white p-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
+              Guide
+            </p>
+            <h2 className="text-xl font-black">{guides.length} videos</h2>
+          </div>
+          <PlayCircle size={26} />
+        </div>
+
+        <div className="grid gap-3">
+          {guides.length ? (
+            guides.map((guide) => (
+              <article
+                key={guide.id}
+                className={`grid gap-3 rounded-md border p-3 ${
+                  selectedGuideId === guide.id
+                    ? "border-black bg-[var(--theme-accent-soft)]"
+                    : "border-black/10"
+                }`}
+              >
+                <video
+                  src={guide.videoUrl}
+                  controls
+                  preload="metadata"
+                  className="aspect-video w-full rounded-md bg-black object-cover"
+                />
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.14em] text-black/45">
+                      {formatDate(guide.createdAt)}
+                    </p>
+                    <h3 className="mt-1 font-black">{guide.title}</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(guide)}
+                      className="grid size-9 place-items-center rounded-md border border-black/15"
+                      aria-label="Modifier"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(guide)}
+                      className="grid size-9 place-items-center rounded-md border border-black/15 text-red-700"
+                      aria-label="Supprimer"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))
+          ) : (
+            <p className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-5 text-sm font-semibold text-black/55">
+              Aucune video guide pour le moment.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <form onSubmit={onSubmit} className="h-fit rounded-md border border-black/10 bg-white p-4">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
+              Edition
+            </p>
+            <h2 className="text-xl font-black">
+              {selectedGuide ? `Modifier ${selectedGuide.title}` : "Ajouter une video guide"}
+            </h2>
+          </div>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="inline-flex h-11 items-center gap-2 rounded-md bg-black px-4 text-sm font-black text-white disabled:opacity-60"
+          >
+            {selectedGuideId ? <Save size={18} /> : <Plus size={18} />}
+            {isSaving ? "Enregistrement..." : "Enregistrer"}
+          </button>
+        </div>
+
+        <div className="grid gap-4">
+          <Input
+            label="Titre"
+            value={form.title}
+            onChange={(value) => onChange("title", value)}
+            required
+          />
+          <Input
+            label="URL video"
+            value={form.videoUrl}
+            onChange={(value) => onChange("videoUrl", value)}
+            required
+          />
+          {form.videoUrl ? (
+            <video
+              src={form.videoUrl}
+              controls
+              preload="metadata"
+              className="aspect-video w-full rounded-md border border-black/10 bg-black object-cover"
+            />
+          ) : (
+            <div className="grid aspect-video place-items-center rounded-md border border-black/10 bg-[var(--theme-mist)] text-sm font-semibold text-black/45">
+              Apercu video
+            </div>
+          )}
+          <label className="inline-flex h-11 w-fit cursor-pointer items-center gap-2 rounded-md border border-black/15 px-4 text-sm font-black">
+            <input type="file" accept="video/*" onChange={onUpload} className="sr-only" />
+            <Upload size={18} />
+            {isUploading ? "Upload..." : "Uploader une video"}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onReset}
+              className="inline-flex h-10 items-center rounded-md border border-black/15 px-3 text-sm font-black"
+            >
+              Nouveau guide
+            </button>
+          </div>
+          {status ? <p className="text-sm font-bold text-[var(--theme-deep)]">{status}</p> : null}
+        </div>
+      </form>
+    </div>
   );
 }
 
@@ -723,15 +1039,15 @@ function Input({
   required?: boolean;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-bold">
-      {label}
+    <label className="grid min-w-0 gap-2 text-sm font-bold">
+      <span className="truncate">{label}</span>
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
         type={type}
         step={step}
         required={required}
-        className="h-11 rounded-md border border-black/15 px-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
+        className="h-11 w-full min-w-0 rounded-md border border-black/15 px-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
       />
     </label>
   );
@@ -749,12 +1065,12 @@ function Select({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-bold">
-      {label}
+    <label className="grid min-w-0 gap-2 text-sm font-bold">
+      <span className="truncate">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 rounded-md border border-black/15 bg-white px-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
+        className="h-11 w-full min-w-0 rounded-md border border-black/15 bg-white px-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

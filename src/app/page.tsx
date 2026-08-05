@@ -5,6 +5,7 @@ import {
   ChevronDown,
   CreditCard,
   Minus,
+  PlayCircle,
   Plus,
   Search,
   ShieldCheck,
@@ -20,6 +21,12 @@ import { formatPrice } from "@/lib/money";
 type Cart = Record<string, number>;
 type Category = (typeof categories)[number];
 type SortMode = "featured" | "price-asc" | "price-desc";
+
+type GuideVideo = {
+  id: string;
+  title: string;
+  videoUrl: string;
+};
 
 const stockLabel = {
   "in-stock": "En stock",
@@ -42,6 +49,7 @@ export default function Home() {
   const [sort, setSort] = useState<SortMode>("featured");
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<Product[]>(defaultProducts);
+  const [guides, setGuides] = useState<GuideVideo[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [status, setStatus] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -64,7 +72,23 @@ export default function Home() {
       }
     }
 
+    async function loadGuides() {
+      try {
+        const response = await fetch("/api/guides");
+        const result = await response.json();
+
+        if (isMounted && Array.isArray(result.guides)) {
+          setGuides(result.guides);
+        }
+      } catch {
+        if (isMounted) {
+          setGuides([]);
+        }
+      }
+    }
+
     loadProducts();
+    loadGuides();
 
     return () => {
       isMounted = false;
@@ -181,12 +205,22 @@ export default function Home() {
 
       <header className="sticky top-0 z-30 border-b border-black/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <a href="#" className="text-2xl font-black tracking-tight">
-            LABFIT
+          <a href="#" className="flex items-center gap-3">
+            <img
+              src="/bip-peptide-logo.jpeg"
+              alt="BIP PEPTIDE"
+              className="size-11 rounded-full border border-black/10 object-cover"
+            />
+            <span className="text-xl font-black tracking-tight sm:text-2xl">
+              BIP PEPTIDE
+            </span>
           </a>
           <nav className="hidden items-center gap-7 text-sm font-semibold text-black/70 md:flex">
             <a href="#boutique" className="hover:text-black">
               Boutique
+            </a>
+            <a href="#guide" className="hover:text-black">
+              Guide
             </a>
             <a href="#checkout" className="hover:text-black">
               Panier
@@ -221,14 +255,15 @@ export default function Home() {
         <div className="mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:py-20">
           <div className="max-w-3xl">
             <p className="mb-4 text-xs font-black uppercase tracking-[0.22em] text-white/75">
-              Boutique recherche & fitness
+              BIP PEPTIDE
             </p>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.03] sm:text-6xl lg:text-7xl">
-              Catalogue premium avec paiement en ligne.
+              Peptides premium avec paiement en ligne.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
-              Une experience plus elegante pour presenter tes produits, mettre
-              les prix en avant et guider le client rapidement vers le panier.
+              Une experience plus elegante pour presenter les produits BIP
+              PEPTIDE, mettre les prix en avant et guider le client rapidement
+              vers le panier.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -239,10 +274,11 @@ export default function Home() {
                 Voir la boutique
               </a>
               <a
-                href="/admin"
-                className="inline-flex h-12 items-center justify-center rounded-md border border-white/40 px-5 text-sm font-black text-white transition hover:bg-white/12"
+                href="#guide"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 text-sm font-black text-white transition hover:bg-white/12"
               >
-                Admin catalogue
+                <PlayCircle size={18} />
+                Voir le guide
               </a>
             </div>
           </div>
@@ -261,6 +297,49 @@ export default function Home() {
         >
           Image by magnific
         </a>
+      </section>
+
+      <section id="guide" className="border-b border-black/10 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+          <div className="mb-7 flex flex-col gap-2">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-black/55">
+              Guide
+            </p>
+            <h2 className="text-3xl font-black">Videos guide</h2>
+            <p className="max-w-2xl text-sm leading-6 text-black/55">
+              Videos ajoutees par l'admin pour presenter des informations
+              generales. Les contenus doivent rester conformes aux regles et ne
+              pas remplacer un avis professionnel.
+            </p>
+          </div>
+
+          {guides.length ? (
+            <div className="grid gap-5 md:grid-cols-2">
+              {guides.map((guide) => (
+                <article
+                  key={guide.id}
+                  className="overflow-hidden rounded-md border border-black/10 bg-white"
+                >
+                  <div className="aspect-video bg-black">
+                    <video
+                      src={guide.videoUrl}
+                      controls
+                      preload="metadata"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-black">{guide.title}</h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-5 text-sm font-semibold text-black/55">
+              Les videos du guide apparaitront ici apres ajout depuis l'admin.
+            </div>
+          )}
+        </div>
       </section>
 
       <section id="boutique" className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

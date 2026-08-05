@@ -3,7 +3,15 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 
-const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const allowedTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+]);
 
 export async function POST(request: Request) {
   if (!(await isAdminAuthenticated())) {
@@ -14,7 +22,10 @@ export async function POST(request: Request) {
   const file = formData.get("file");
 
   if (!(file instanceof File) || !allowedTypes.has(file.type)) {
-    return NextResponse.json({ message: "Image JPG, PNG, WebP ou GIF requise." }, { status: 400 });
+    return NextResponse.json(
+      { message: "Fichier JPG, PNG, WebP, GIF, MP4, WebM ou MOV requis." },
+      { status: 400 },
+    );
   }
 
   const extension = extensionFromType(file.type);
@@ -32,6 +43,9 @@ function extensionFromType(type: string) {
   if (type === "image/png") return "png";
   if (type === "image/webp") return "webp";
   if (type === "image/gif") return "gif";
+  if (type === "video/mp4") return "mp4";
+  if (type === "video/webm") return "webm";
+  if (type === "video/quicktime") return "mov";
   return "jpg";
 }
 
