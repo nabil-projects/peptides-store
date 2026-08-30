@@ -8,7 +8,7 @@ const ordersFile = path.join(dataDir, "orders.json");
 export type OrderStatus = "pending_payment" | "paid" | "cancelled";
 
 export type OrderInput = {
-  paymentMethod?: "bank";
+  paymentMethod?: "whatsapp";
   customer: {
     name: string;
     phone: string;
@@ -28,7 +28,7 @@ export type StoredOrder = {
   createdAt: string;
   updatedAt: string;
   status: OrderStatus;
-  paymentMethod: "bank";
+  paymentMethod: "whatsapp";
   customer: OrderInput["customer"];
   items: Array<{
     productId: string;
@@ -80,7 +80,7 @@ export async function createOrderRecord(order: OrderInput, products: Product[]) 
     createdAt: now,
     updatedAt: now,
     status: "pending_payment",
-    paymentMethod: "bank",
+    paymentMethod: "whatsapp",
     customer: {
       name: String(order.customer.name || "").trim(),
       phone: String(order.customer.phone || "").trim(),
@@ -146,7 +146,7 @@ function normalizeStoredOrder(order: StoredOrder) {
   return {
     ...order,
     status,
-    paymentMethod: "bank",
+    paymentMethod: "whatsapp",
   } satisfies StoredOrder;
 }
 

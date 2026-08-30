@@ -32,7 +32,7 @@ type StoredOrder = {
   createdAt: string;
   updatedAt: string;
   status: OrderStatus;
-  paymentMethod: "bank";
+  paymentMethod: "whatsapp";
   customer: {
     name: string;
     phone: string;
@@ -109,7 +109,7 @@ export default function AdminPage() {
   const [guideForm, setGuideForm] = useState<GuideFormState>(emptyGuideForm);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"orders" | "guides" | "products">("orders");
+  const [activeTab, setActiveTab] = useState<"orders" | "products">("orders");
   const [productSearch, setProductSearch] = useState("");
   const [status, setStatus] = useState("");
   const [password, setPassword] = useState("");
@@ -530,16 +530,6 @@ export default function AdminPage() {
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab("guides")}
-          className={`inline-flex h-11 items-center gap-2 rounded-md px-4 text-sm font-black ${
-            activeTab === "guides" ? "bg-black text-white" : "border border-black/15 bg-white"
-          }`}
-        >
-          <PlayCircle size={18} />
-          Guide ({guides.length})
-        </button>
-        <button
-          type="button"
           onClick={() => setActiveTab("products")}
           className={`inline-flex h-11 items-center gap-2 rounded-md px-4 text-sm font-black ${
             activeTab === "products" ? "bg-black text-white" : "border border-black/15 bg-white"
@@ -556,21 +546,6 @@ export default function AdminPage() {
           onStatusChange={changeOrderStatus}
           onDelete={removeOrder}
           onRefresh={loadOrders}
-        />
-      ) : activeTab === "guides" ? (
-        <GuidesPanel
-          guides={guides}
-          form={guideForm}
-          selectedGuideId={selectedGuideId}
-          status={status}
-          isSaving={isSavingGuide}
-          isUploading={isUploadingGuide}
-          onSubmit={saveGuide}
-          onChange={updateGuideField}
-          onEdit={editGuide}
-          onDelete={removeGuide}
-          onReset={resetGuideForm}
-          onUpload={uploadGuideVideo}
         />
       ) : (
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr]">
@@ -1001,7 +976,7 @@ function OrdersPanel({
                     </div>
                     <div className="rounded-md bg-[var(--theme-mist)] p-3 text-sm leading-6">
                       <p className="font-black">Paiement</p>
-                      <p>Virement / SEPA</p>
+                      <p>Contact WhatsApp</p>
                       <p>Sous-total: {formatPrice(order.subtotal)}</p>
                       <p>Livraison: {order.shipping ? formatPrice(order.shipping) : "Offerte"}</p>
                       <p className="font-black">Total: {formatPrice(order.total)}</p>

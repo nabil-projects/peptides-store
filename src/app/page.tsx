@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import {
   BadgeCheck,
   ChevronDown,
+  Mail,
   Minus,
-  PlayCircle,
   Plus,
   Search,
   ShieldCheck,
@@ -21,12 +21,7 @@ type Cart = Record<string, number>;
 type Category = (typeof categories)[number];
 type SortMode = "featured" | "price-asc" | "price-desc";
 const productsPerPage = 6;
-
-type GuideVideo = {
-  id: string;
-  title: string;
-  videoUrl: string;
-};
+const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "";
 
 const stockLabel = {
   "in-stock": "En stock",
@@ -36,10 +31,10 @@ const stockLabel = {
 
 const trustMessages = [
   { icon: Truck, label: "Livraison suivie" },
-  { icon: ShieldCheck, label: "Paiement securise" },
-  { icon: BadgeCheck, label: "Lots verifies" },
+  { icon: ShieldCheck, label: "Contact WhatsApp" },
+  { icon: BadgeCheck, label: "Purete controlee" },
   { icon: Truck, label: "Expedition rapide" },
-  { icon: ShieldCheck, label: "Checkout protege" },
+  { icon: ShieldCheck, label: "Commande accompagnee" },
   { icon: BadgeCheck, label: "Catalogue controle" },
 ];
 
@@ -49,7 +44,6 @@ export default function Home() {
   const [sort, setSort] = useState<SortMode>("featured");
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<Product[]>(defaultProducts);
-  const [guides, setGuides] = useState<GuideVideo[]>([]);
   const [productPage, setProductPage] = useState(1);
   const [orderNotice, setOrderNotice] = useState<{
     orderId?: string;
@@ -77,23 +71,7 @@ export default function Home() {
       }
     }
 
-    async function loadGuides() {
-      try {
-        const response = await fetch("/api/guides");
-        const result = await response.json();
-
-        if (isMounted && Array.isArray(result.guides)) {
-          setGuides(result.guides);
-        }
-      } catch {
-        if (isMounted) {
-          setGuides([]);
-        }
-      }
-    }
-
     loadProducts();
-    loadGuides();
 
     return () => {
       isMounted = false;
@@ -120,7 +98,7 @@ export default function Home() {
       if (sort === "price-desc") return b.price - a.price;
       return 0;
     });
-  }, [category, search, sort]);
+  }, [category, products, search, sort]);
 
   const totalProductPages = Math.max(1, Math.ceil(visibleProducts.length / productsPerPage));
   const safeProductPage = Math.min(productPage, totalProductPages);
@@ -151,6 +129,9 @@ export default function Home() {
   );
   const shipping = subtotal >= 900 || subtotal === 0 ? 0 : 49;
   const total = subtotal + shipping;
+  const directWhatsappUrl = buildWhatsappUrl(
+    "Bonjour, je souhaite vous contacter pour une commande.",
+  );
 
   function updateCart(productId: string, quantity: number) {
     setCart((current) => ({ ...current, [productId]: Math.max(0, quantity) }));
@@ -173,7 +154,7 @@ export default function Home() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        paymentMethod: "bank",
+        paymentMethod: "whatsapp",
         customer: {
           name: form.get("name"),
           phone: form.get("phone"),
@@ -193,14 +174,35 @@ export default function Home() {
 
     setStatus(result.message);
     if (response.ok) {
+      const whatsappMessage = buildWhatsappMessage(result.orderId, {
+        name: String(form.get("name") || ""),
+        phone: String(form.get("phone") || ""),
+        email: String(form.get("email") || ""),
+        city: String(form.get("city") || ""),
+        address: String(form.get("address") || ""),
+      }, cartItems, total);
+
+      const whatsappUrl = buildWhatsappUrl(whatsappMessage);
+
+      if (!whatsappUrl) {
+        setOrderNotice({
+          orderId: result.orderId,
+          message:
+            "Commande enregistree, mais le numero WhatsApp vendeur n'est pas configure.",
+        });
+        setStatus("Ajoute NEXT_PUBLIC_WHATSAPP_PHONE dans .env.local puis relance le projet.");
+        return;
+      }
+
       setOrderNotice({
         orderId: result.orderId,
         message:
           result.message ||
-          "Commande confirmee. Le vendeur te contactera pour les instructions de virement.",
+          "Commande confirmee. Redirection vers WhatsApp pour finaliser avec le vendeur.",
       });
       setCart({});
       checkoutForm.reset();
+      window.location.assign(whatsappUrl);
     }
   }
 
@@ -254,9 +256,9 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <a href="#" className="flex items-center gap-3">
             <img
-              src="/bip-peptide-logo.jpeg"
+              src="/bip-peptide-logo.png"
               alt="BIP PEPTIDE"
-              className="size-11 rounded-full border border-black/10 object-cover"
+              className="size-11 rounded-full border border-black/10 bg-white object-cover"
             />
             <span className="text-xl font-black tracking-tight sm:text-2xl">
               BIP PEPTIDE
@@ -265,9 +267,6 @@ export default function Home() {
           <nav className="hidden items-center gap-7 text-sm font-semibold text-black/70 md:flex">
             <a href="#boutique" className="hover:text-black">
               Boutique
-            </a>
-            <a href="#guide" className="hover:text-black">
-              Guide
             </a>
             <a href="#checkout" className="hover:text-black">
               Panier
@@ -289,7 +288,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="relative isolate min-h-[70vh] overflow-hidden bg-[var(--theme-ink)] text-white">
+      <section className="relative isolate min-h-[70vh] overflow-hidden bg-[var(--theme-deep)] text-white">
         <img
           src="/landing-hyaluronic.jpg"
           alt=""
@@ -305,12 +304,11 @@ export default function Home() {
               BIP PEPTIDE
             </p>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.03] sm:text-6xl lg:text-7xl">
-              Peptides premium avec paiement en ligne.
+              Excellence, performance et selection professionnelle.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
-              Une experience plus elegante pour presenter les produits BIP
-              PEPTIDE, mettre les prix en avant et guider le client rapidement
-              vers le panier.
+              Une boutique soignee avec un catalogue fluide, des prix visibles
+              et une experience simple pour passer de la selection au panier.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -321,19 +319,21 @@ export default function Home() {
                 Voir la boutique
               </a>
               <a
-                href="#guide"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 text-sm font-black text-white transition hover:bg-white/12"
+                href={directWhatsappUrl || "#checkout"}
+                target={directWhatsappUrl ? "_blank" : undefined}
+                rel={directWhatsappUrl ? "noreferrer" : undefined}
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/45 bg-white/8 px-5 text-sm font-black text-white transition hover:bg-white/18"
               >
-                <PlayCircle size={18} />
-                Voir le guide
+                <ShieldCheck size={18} />
+                Contact WhatsApp
               </a>
             </div>
           </div>
 
           <div className="mt-12 grid max-w-3xl gap-3 text-sm font-bold text-white/82 sm:grid-cols-3">
-            <span className="border-t border-white/25 pt-3">Lots verifies</span>
-            <span className="border-t border-white/25 pt-3">Prix modifiables</span>
-            <span className="border-t border-white/25 pt-3">Photos dynamiques</span>
+            <span className="border-t border-white/25 pt-3">Purete controlee</span>
+            <span className="border-t border-white/25 pt-3">Dosage de precision</span>
+            <span className="border-t border-white/25 pt-3">Tracabilite laboratoire</span>
           </div>
         </div>
         <a
@@ -344,49 +344,6 @@ export default function Home() {
         >
           Image by magnific
         </a>
-      </section>
-
-      <section id="guide" className="border-b border-black/10 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-          <div className="mb-7 flex flex-col gap-2">
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-black/55">
-              Guide
-            </p>
-            <h2 className="text-3xl font-black">Videos guide</h2>
-            <p className="max-w-2xl text-sm leading-6 text-black/55">
-              Videos ajoutees par l'admin pour presenter des informations
-              generales. Les contenus doivent rester conformes aux regles et ne
-              pas remplacer un avis professionnel.
-            </p>
-          </div>
-
-          {guides.length ? (
-            <div className="grid gap-5 md:grid-cols-2">
-              {guides.map((guide) => (
-                <article
-                  key={guide.id}
-                  className="overflow-hidden rounded-md border border-black/10 bg-white"
-                >
-                  <div className="aspect-video bg-black">
-                    <video
-                      src={guide.videoUrl}
-                      controls
-                      preload="metadata"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-black">{guide.title}</h3>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-5 text-sm font-semibold text-black/55">
-              Les videos du guide apparaitront ici apres ajout depuis l'admin.
-            </div>
-          )}
-        </div>
       </section>
 
       <section id="boutique" className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -652,11 +609,11 @@ export default function Home() {
             <Input name="address" label="Adresse de livraison" required />
 
             <div className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-4">
-              <p className="font-black">Paiement par virement / SEPA</p>
+              <p className="font-black">Commande par contact WhatsApp</p>
               <p className="mt-2 text-sm leading-6 text-black/60">
-                Apres validation, la commande est enregistree avec le statut
-                paiement en attente. Les instructions de virement seront
-                envoyees par email ou confirmees directement par le vendeur.
+                Apres validation, la commande est enregistree et WhatsApp
+                s'ouvre avec le resume pret a envoyer au vendeur. Le paiement
+                se confirme ensuite directement avec lui.
               </p>
             </div>
 
@@ -666,21 +623,115 @@ export default function Home() {
               className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-5 font-black text-white transition hover:bg-[var(--theme-deep)] disabled:opacity-60"
             >
               <ShieldCheck size={18} />
-              {isSending ? "Preparation..." : "Confirmer la commande"}
+              {isSending ? "Preparation..." : "Contacter sur WhatsApp"}
             </button>
             {status ? <p className="text-sm font-semibold text-[var(--theme-deep)]">{status}</p> : null}
           </form>
         </div>
       </section>
 
-      <footer id="legal" className="mx-auto max-w-7xl px-4 py-8 text-xs leading-5 text-black/52 sm:px-6">
-        Les informations sont indicatives et doivent etre validees par le
-        vendeur. Les produits sensibles doivent respecter la reglementation
-        applicable, les conditions du prestataire de paiement et les obligations
-        etiquetage.
+      <footer id="legal" className="bg-[#050505] text-white">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
+          <div className="grid gap-10 md:grid-cols-[1fr_1fr_1.35fr]">
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-[0.18em]">
+                Main Menu
+              </h2>
+              <nav className="mt-6 grid gap-4 text-sm text-white/68">
+                <a href="#" className="w-fit hover:text-white">Home</a>
+                <a href="#boutique" className="w-fit hover:text-white">Shop</a>
+                <a href="#checkout" className="w-fit hover:text-white">Contact</a>
+                <a href="#legal" className="w-fit hover:text-white">FAQ</a>
+              </nav>
+            </div>
+
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-[0.18em]">
+                Footer Menu
+              </h2>
+              <nav className="mt-6 grid gap-4 text-sm text-white/68">
+                <a href="#boutique" className="w-fit hover:text-white">Search</a>
+                <a href="#" className="w-fit hover:text-white">About Us</a>
+                <a href="#legal" className="w-fit hover:text-white">Terms of Service</a>
+                <a href="#legal" className="w-fit hover:text-white">Privacy Policy</a>
+                <a href="#legal" className="w-fit hover:text-white">Refund Policy</a>
+              </nav>
+            </div>
+
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-[0.18em]">
+                Sign Up And Save
+              </h2>
+              <p className="mt-6 max-w-sm text-sm leading-6 text-white/68">
+                Recevez les nouveautes, les alertes catalogue et les offres
+                disponibles directement par email.
+              </p>
+              <label className="mt-5 flex h-12 max-w-sm items-center rounded-md border border-white/85 px-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/58"
+                />
+                <Mail size={21} className="text-white/70" />
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-10 text-center text-xs leading-6 text-white/58">
+            <p>
+              Copyright 2026 BIP PEPTIDE. Boutique specialisee avec catalogue
+              selectionne, contact direct et accompagnement client.
+            </p>
+          </div>
+        </div>
       </footer>
     </main>
   );
+}
+
+function buildWhatsappMessage(
+  orderId: string | undefined,
+  customer: {
+    name: string;
+    phone: string;
+    email: string;
+    city: string;
+    address: string;
+  },
+  cartItems: Array<{ product: Product; quantity: number }>,
+  total: number,
+) {
+  const products = cartItems
+    .map((item) => `- ${item.product.name} x${item.quantity} (${formatPrice(item.product.price)})`)
+    .join("\n");
+
+  return [
+    "Bonjour, je veux finaliser cette commande BIP PEPTIDE.",
+    orderId ? `Reference: ${orderId}` : "",
+    "",
+    `Nom: ${customer.name}`,
+    `Telephone: ${customer.phone}`,
+    `Email: ${customer.email}`,
+    `Ville: ${customer.city}`,
+    `Adresse: ${customer.address}`,
+    "",
+    "Produits:",
+    products,
+    "",
+    `Total: ${formatPrice(total)}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function buildWhatsappUrl(message: string) {
+  const normalizedPhone = whatsappPhone.replace(/\D/g, "");
+
+  if (!normalizedPhone) {
+    return "";
+  }
+
+  return `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(message)}`;
 }
 
 function Input({

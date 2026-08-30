@@ -11,7 +11,7 @@ type OrderItem = {
 };
 
 type OrderRequest = {
-  paymentMethod?: "bank";
+  paymentMethod?: "whatsapp";
   customer: {
     name: string;
     phone: string;
@@ -58,7 +58,7 @@ function buildOrderText(order: OrderRequest, products: Product[]) {
   return [
     "Nouvelle commande",
     "",
-    "Paiement: Virement / SEPA",
+    "Contact: WhatsApp",
     `Total produits: ${formatPrice(total)}`,
     "",
     `Nom: ${order.customer.name}`,
@@ -103,7 +103,7 @@ async function sendOrderEmail(order: OrderRequest, products: Product[]) {
 export async function POST(request: Request) {
   const order = {
     ...((await request.json()) as OrderRequest),
-    paymentMethod: "bank" as const,
+    paymentMethod: "whatsapp" as const,
   };
   const products = await getProducts();
 
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     message:
-      "Commande enregistree. Les instructions de virement/SEPA seront envoyees par email ou confirmees par le vendeur.",
+      "Commande enregistree. WhatsApp va s'ouvrir pour finaliser avec le vendeur.",
     orderId: storedOrder.id,
   });
 }

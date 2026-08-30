@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "BIP PEPTIDE - Boutique",
-  description: "Boutique BIP PEPTIDE avec catalogue, guide et paiement configurable.",
+  description: "Boutique BIP PEPTIDE avec catalogue et contact WhatsApp.",
 };
 
 export default function RootLayout({
