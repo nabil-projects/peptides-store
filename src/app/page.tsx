@@ -3,6 +3,8 @@
 import {
   BadgeCheck,
   ChevronDown,
+  Languages,
+  LogIn,
   Mail,
   Minus,
   Plus,
@@ -20,25 +22,173 @@ import { formatPrice } from "@/lib/money";
 type Cart = Record<string, number>;
 type Category = (typeof categories)[number];
 type SortMode = "featured" | "price-asc" | "price-desc";
+type Language = "fr" | "en";
 const productsPerPage = 6;
 const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "";
 
-const stockLabel = {
-  "in-stock": "En stock",
-  preorder: "Precommande",
-  notify: "Sur demande",
-};
+const copy = {
+  fr: {
+    accessTitle: "Acces Professionnel",
+    accessText:
+      "BIP HORIZON fournit des composes exclusivement pour la recherche en laboratoire. L'acces est reserve aux professionnels qualifies.",
+    accessConfirm:
+      "Je confirme etre un professionnel qualifie et que cette commande est uniquement destinee a la recherche en laboratoire.",
+    accessButton: "Acceder au site",
+    accessLegal:
+      "En entrant, vous confirmez etre en conformite avec toutes les lois applicables dans votre juridiction.",
+    alert:
+      "Attention: ce site est reserve uniquement aux laboratoires et a la recherche.",
+    navShop: "Boutique",
+    navCart: "Panier",
+    navTerms: "Conditions",
+    adminLogin: "Connexion admin",
+    cartArticle: "article",
+    cartArticles: "articles",
+    trust: [
+      "Livraison suivie",
+      "Contact WhatsApp",
+      "Purete controlee",
+      "Expedition rapide",
+      "Commande accompagnee",
+      "Catalogue controle",
+    ],
+    heroTitle: "Excellence, performance et selection professionnelle.",
+    heroText:
+      "Une boutique soignee avec un catalogue fluide, des prix visibles et une experience simple pour passer de la selection au panier.",
+    viewShop: "Voir la boutique",
+    whatsapp: "Contact WhatsApp",
+    technical: ["Purete controlee", "Dosage de precision", "Tracabilite laboratoire"],
+    shop: "Boutique",
+    allProducts: "Tous les produits",
+    loading: "Chargement du catalogue...",
+    searchPlaceholder: "Rechercher un produit",
+    defaultSort: "Tri par defaut",
+    priceAsc: "Prix croissant",
+    priceDesc: "Prix decroissant",
+    categories: "Categories",
+    neutralNote:
+      "Les fiches doivent rester neutres : pas de promesse medicale, pas de conseil utilisation clinique.",
+    quote: "Devis",
+    notRated: "Non note",
+    addToCart: "Ajouter au panier",
+    productCount: "produits",
+    previous: "Precedent",
+    next: "Suivant",
+    cart: "Panier",
+    priceOnRequest: "Prix sur demande",
+    emptyCart: "Le panier est vide.",
+    subtotal: "Sous-total",
+    shipping: "Livraison",
+    free: "Offerte",
+    customerInfo: "Informations client",
+    name: "Nom complet",
+    phone: "Telephone",
+    email: "Email",
+    city: "Ville",
+    address: "Adresse de livraison",
+    contactOrder: "Commande par contact WhatsApp",
+    contactText:
+      "Apres validation, la commande est enregistree et WhatsApp s'ouvre avec le resume pret a envoyer au vendeur. Le paiement se confirme ensuite directement avec lui.",
+    sending: "Preparation...",
+    contactWhatsapp: "Contacter sur WhatsApp",
+    mainMenu: "Main Menu",
+    footerMenu: "Footer Menu",
+    signup: "Sign Up And Save",
+    signupText:
+      "Recevez les nouveautes, les alertes catalogue et les offres disponibles directement par email.",
+    emailPlaceholder: "Enter your email",
+    footerLine:
+      "Copyright 2026 BIP HORIZON. Boutique specialisee avec catalogue selectionne, contact direct et accompagnement client.",
+    stock: {
+      "in-stock": "En stock",
+      preorder: "Precommande",
+      notify: "Sur demande",
+    },
+  },
+  en: {
+    accessTitle: "Professional Access",
+    accessText:
+      "BIP HORIZON supplies compounds exclusively for laboratory research. Access is reserved for qualified professionals.",
+    accessConfirm:
+      "I confirm that I am a qualified professional and that this order is intended only for laboratory research.",
+    accessButton: "Enter Site",
+    accessLegal:
+      "By entering, you confirm that you comply with all applicable laws in your jurisdiction.",
+    alert:
+      "Notice: this site is reserved only for laboratories and research purposes.",
+    navShop: "Shop",
+    navCart: "Cart",
+    navTerms: "Terms",
+    adminLogin: "Admin login",
+    cartArticle: "item",
+    cartArticles: "items",
+    trust: [
+      "Tracked delivery",
+      "WhatsApp contact",
+      "Controlled purity",
+      "Fast dispatch",
+      "Assisted order",
+      "Controlled catalogue",
+    ],
+    heroTitle: "Excellence, performance and professional selection.",
+    heroText:
+      "A refined store with a fluid catalogue, visible pricing and a simple path from selection to cart.",
+    viewShop: "View shop",
+    whatsapp: "WhatsApp contact",
+    technical: ["Controlled purity", "Precision dosing", "Laboratory traceability"],
+    shop: "Shop",
+    allProducts: "All products",
+    loading: "Loading catalogue...",
+    searchPlaceholder: "Search products",
+    defaultSort: "Default sort",
+    priceAsc: "Price low to high",
+    priceDesc: "Price high to low",
+    categories: "Categories",
+    neutralNote:
+      "Product sheets must remain neutral: no medical promises and no clinical usage advice.",
+    quote: "Quote",
+    notRated: "Not rated",
+    addToCart: "Add to cart",
+    productCount: "products",
+    previous: "Previous",
+    next: "Next",
+    cart: "Cart",
+    priceOnRequest: "Price on request",
+    emptyCart: "Your cart is empty.",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    free: "Free",
+    customerInfo: "Customer information",
+    name: "Full name",
+    phone: "Phone",
+    email: "Email",
+    city: "City",
+    address: "Delivery address",
+    contactOrder: "Order by WhatsApp contact",
+    contactText:
+      "After confirmation, the order is saved and WhatsApp opens with a summary ready to send to the seller. Payment is then confirmed directly with them.",
+    sending: "Preparing...",
+    contactWhatsapp: "Contact on WhatsApp",
+    mainMenu: "Main Menu",
+    footerMenu: "Footer Menu",
+    signup: "Sign Up And Save",
+    signupText:
+      "Receive new arrivals, catalogue alerts and available offers directly by email.",
+    emailPlaceholder: "Enter your email",
+    footerLine:
+      "Copyright 2026 BIP HORIZON. Specialist store with curated catalogue, direct contact and customer support.",
+    stock: {
+      "in-stock": "In stock",
+      preorder: "Preorder",
+      notify: "On request",
+    },
+  },
+} as const;
 
-const trustMessages = [
-  { icon: Truck, label: "Livraison suivie" },
-  { icon: ShieldCheck, label: "Contact WhatsApp" },
-  { icon: BadgeCheck, label: "Purete controlee" },
-  { icon: Truck, label: "Expedition rapide" },
-  { icon: ShieldCheck, label: "Commande accompagnee" },
-  { icon: BadgeCheck, label: "Catalogue controle" },
-];
+const trustIcons = [Truck, ShieldCheck, BadgeCheck, Truck, ShieldCheck, BadgeCheck];
 
 export default function Home() {
+  const [language, setLanguage] = useState<Language>("fr");
   const [cart, setCart] = useState<Cart>({});
   const [category, setCategory] = useState<Category>("Tous");
   const [sort, setSort] = useState<SortMode>("featured");
@@ -52,6 +202,33 @@ export default function Home() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [status, setStatus] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [isAccessConfirmed, setIsAccessConfirmed] = useState(false);
+  const [isAccessChecked, setIsAccessChecked] = useState(false);
+  const text = copy[language];
+  const stockLabel = text.stock;
+  const trustMessages = text.trust.map((label, index) => ({
+    icon: trustIcons[index] || BadgeCheck,
+    label,
+  }));
+
+  useEffect(() => {
+    setIsAccessConfirmed(localStorage.getItem("bip-horizon-access") === "accepted");
+    setLanguage(localStorage.getItem("bip-horizon-language") === "en" ? "en" : "fr");
+  }, []);
+
+  useEffect(() => {
+    if (isAccessConfirmed) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isAccessConfirmed]);
 
   useEffect(() => {
     let isMounted = true;
@@ -137,6 +314,23 @@ export default function Home() {
     setCart((current) => ({ ...current, [productId]: Math.max(0, quantity) }));
   }
 
+  function confirmAccess() {
+    if (!isAccessChecked) {
+      return;
+    }
+
+    localStorage.setItem("bip-horizon-access", "accepted");
+    setIsAccessConfirmed(true);
+  }
+
+  function toggleLanguage() {
+    setLanguage((current) => {
+      const next = current === "fr" ? "en" : "fr";
+      localStorage.setItem("bip-horizon-language", next);
+      return next;
+    });
+  }
+
   async function checkout(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const checkoutForm = event.currentTarget;
@@ -208,6 +402,51 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[var(--theme-mist)] text-[var(--theme-ink)]">
+      {!isAccessConfirmed ? (
+        <div className="fixed inset-0 z-[100] grid min-h-screen place-items-center bg-black/45 px-4 py-6 text-black backdrop-blur-md">
+          <div className="w-full max-w-xl rounded-md border border-black/10 bg-white/95 px-5 py-8 text-center shadow-2xl ring-1 ring-white/50 sm:px-9 sm:py-10">
+            <div className="mx-auto mb-6 grid size-12 place-items-center rounded-full border border-black/10 bg-white">
+              <img
+                src="/bip-peptide-logo.png"
+                alt="BIP HORIZON"
+                className="size-9 rounded-full bg-white object-cover"
+              />
+            </div>
+            <h1 className="text-2xl font-black sm:text-4xl">
+              {text.accessTitle}
+            </h1>
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-black/58 sm:text-base">
+              {text.accessText}
+            </p>
+
+            <label className="mx-auto mt-6 flex max-w-lg cursor-pointer items-start gap-3 rounded-md border border-black/12 bg-[var(--theme-mist)] p-4 text-left text-sm leading-6 text-black/70 sm:text-base">
+              <input
+                type="checkbox"
+                checked={isAccessChecked}
+                onChange={(event) => setIsAccessChecked(event.target.checked)}
+                className="mt-1 size-4 shrink-0 accent-black"
+              />
+              <span>
+                {text.accessConfirm}
+              </span>
+            </label>
+
+            <button
+              type="button"
+              onClick={confirmAccess}
+              disabled={!isAccessChecked}
+              className="mx-auto mt-5 flex h-12 w-full max-w-lg items-center justify-center rounded-md bg-black text-xs font-black uppercase tracking-[0.18em] text-white transition hover:bg-neutral-800 disabled:bg-white disabled:text-black/25 disabled:ring-1 disabled:ring-black/12"
+            >
+              {text.accessButton}
+            </button>
+
+            <p className="mx-auto mt-5 max-w-lg text-xs leading-5 text-black/35 sm:text-sm">
+              {text.accessLegal}
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       {orderNotice ? (
         <div className="fixed inset-x-0 top-4 z-50 mx-auto w-[calc(100%-2rem)] max-w-xl rounded-md border border-black/10 bg-white p-4 shadow-2xl">
           <div className="flex items-start gap-3">
@@ -233,6 +472,10 @@ export default function Home() {
         </div>
       ) : null}
 
+      <div className="border-b border-yellow-500 bg-yellow-300 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.14em] text-black sm:text-sm">
+        {text.alert}
+      </div>
+
       <div className="overflow-hidden bg-[var(--theme-ink)] py-2 text-white">
         <div className="trust-marquee flex w-max items-center">
           {[0, 1].map((group) => (
@@ -257,34 +500,52 @@ export default function Home() {
           <a href="#" className="flex items-center gap-3">
             <img
               src="/bip-peptide-logo.png"
-              alt="BIP PEPTIDE"
+              alt="BIP HORIZON"
               className="size-11 rounded-full border border-black/10 bg-white object-cover"
             />
             <span className="text-xl font-black tracking-tight sm:text-2xl">
-              BIP PEPTIDE
+              BIP HORIZON
             </span>
           </a>
           <nav className="hidden items-center gap-7 text-sm font-semibold text-black/70 md:flex">
             <a href="#boutique" className="hover:text-black">
-              Boutique
+              {text.navShop}
             </a>
             <a href="#checkout" className="hover:text-black">
-              Panier
+              {text.navCart}
             </a>
             <a href="#legal" className="hover:text-black">
-              Conditions
-            </a>
-            <a href="/admin" className="hover:text-black">
-              Admin
+              {text.navTerms}
             </a>
           </nav>
-          <a
-            href="#checkout"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
-          >
-            <ShoppingBag size={18} />
-            {cartItems.length} article{cartItems.length > 1 ? "s" : ""}
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href="#checkout"
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
+            >
+              <ShoppingBag size={18} />
+              {cartItems.length}{" "}
+              {cartItems.length > 1 ? text.cartArticles : text.cartArticle}
+            </a>
+            <button
+              type="button"
+              onClick={toggleLanguage}
+              className="inline-flex h-11 items-center gap-2 rounded-md border border-black/15 bg-white px-3 text-xs font-black text-black transition hover:border-black hover:bg-black hover:text-white"
+              aria-label="Changer la langue"
+              title="Changer la langue"
+            >
+              <Languages size={17} />
+              {language === "fr" ? "EN" : "FR"}
+            </button>
+            <a
+              href="/admin"
+              className="grid size-11 place-items-center rounded-md border border-black/15 bg-white text-black transition hover:border-black hover:bg-black hover:text-white"
+              aria-label={text.adminLogin}
+              title={text.adminLogin}
+            >
+              <LogIn size={19} />
+            </a>
+          </div>
         </div>
       </header>
 
@@ -301,14 +562,13 @@ export default function Home() {
         <div className="mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:py-20">
           <div className="max-w-3xl">
             <p className="mb-4 text-xs font-black uppercase tracking-[0.22em] text-white/75">
-              BIP PEPTIDE
+              BIP HORIZON
             </p>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.03] sm:text-6xl lg:text-7xl">
-              Excellence, performance et selection professionnelle.
+              {text.heroTitle}
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
-              Une boutique soignee avec un catalogue fluide, des prix visibles
-              et une experience simple pour passer de la selection au panier.
+              {text.heroText}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -316,7 +576,7 @@ export default function Home() {
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-white px-5 text-sm font-black text-black transition hover:bg-neutral-200"
               >
                 <ShoppingBag size={18} />
-                Voir la boutique
+                {text.viewShop}
               </a>
               <a
                 href={directWhatsappUrl || "#checkout"}
@@ -325,15 +585,15 @@ export default function Home() {
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/45 bg-white/8 px-5 text-sm font-black text-white transition hover:bg-white/18"
               >
                 <ShieldCheck size={18} />
-                Contact WhatsApp
+                {text.whatsapp}
               </a>
             </div>
           </div>
 
           <div className="mt-12 grid max-w-3xl gap-3 text-sm font-bold text-white/82 sm:grid-cols-3">
-            <span className="border-t border-white/25 pt-3">Purete controlee</span>
-            <span className="border-t border-white/25 pt-3">Dosage de precision</span>
-            <span className="border-t border-white/25 pt-3">Tracabilite laboratoire</span>
+            {text.technical.map((item) => (
+              <span key={item} className="border-t border-white/25 pt-3">{item}</span>
+            ))}
           </div>
         </div>
         <a
@@ -350,12 +610,12 @@ export default function Home() {
         <div className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-accent-dark)]">
-              Boutique
+              {text.shop}
             </p>
-            <h2 className="mt-1 text-3xl font-black">Tous les produits</h2>
+            <h2 className="mt-1 text-3xl font-black">{text.allProducts}</h2>
             {isLoadingProducts ? (
               <p className="mt-2 text-sm font-semibold text-black/50">
-                Chargement du catalogue...
+                {text.loading}
               </p>
             ) : null}
           </div>
@@ -368,7 +628,7 @@ export default function Home() {
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Rechercher un produit"
+                placeholder={text.searchPlaceholder}
                 className="h-11 w-full rounded-md border border-black/15 bg-white pl-10 pr-3 text-sm outline-none focus:border-[var(--theme-accent-dark)]"
               />
             </label>
@@ -378,9 +638,9 @@ export default function Home() {
                 onChange={(event) => setSort(event.target.value as SortMode)}
                 className="h-11 appearance-none rounded-md border border-black/15 bg-white px-3 pr-9 text-sm font-semibold outline-none focus:border-[var(--theme-accent-dark)]"
               >
-                <option value="featured">Tri par defaut</option>
-                <option value="price-asc">Prix croissant</option>
-                <option value="price-desc">Prix decroissant</option>
+                <option value="featured">{text.defaultSort}</option>
+                <option value="price-asc">{text.priceAsc}</option>
+                <option value="price-desc">{text.priceDesc}</option>
               </select>
               <ChevronDown
                 size={16}
@@ -393,7 +653,7 @@ export default function Home() {
         <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
           <aside className="h-fit rounded-md border border-black/10 bg-white p-4">
             <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em]">
-              Categories
+              {text.categories}
             </h3>
             <div className="grid gap-2">
               {categories.map((item) => (
@@ -417,8 +677,7 @@ export default function Home() {
               ))}
             </div>
             <div className="mt-5 border-t border-black/10 pt-4 text-sm leading-6 text-black/60">
-              Les fiches doivent rester neutres : pas de promesse medicale, pas
-              de conseil utilisation clinique.
+              {text.neutralNote}
             </div>
           </aside>
 
@@ -455,7 +714,7 @@ export default function Home() {
                       <span className="font-bold">{product.rating}</span>
                     </>
                   ) : (
-                    <span className="text-black/45">Non note</span>
+                    <span className="text-black/45">{text.notRated}</span>
                   )}
                   <span className="ml-auto text-xs font-semibold text-black/45">
                     {product.unit}
@@ -475,7 +734,7 @@ export default function Home() {
                         </p>
                       ) : null}
                       <p className="text-2xl font-black">
-                        {product.price ? formatPrice(product.price) : "Devis"}
+                        {product.price ? formatPrice(product.price) : text.quote}
                       </p>
                     </div>
                     <span className="text-xs font-bold text-[var(--theme-deep)]">
@@ -488,7 +747,7 @@ export default function Home() {
                     className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--theme-ink)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
                   >
                     <Plus size={18} />
-                    Ajouter au panier
+                    {text.addToCart}
                   </button>
                 </div>
                 </article>
@@ -497,7 +756,7 @@ export default function Home() {
 
             <div className="mt-6 flex flex-col gap-3 rounded-md border border-black/10 bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm font-semibold text-black/55">
-                {productRangeStart}-{productRangeEnd} sur {visibleProducts.length} produits
+                {productRangeStart}-{productRangeEnd} / {visibleProducts.length} {text.productCount}
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -506,7 +765,7 @@ export default function Home() {
                   disabled={safeProductPage === 1}
                   className="h-10 rounded-md border border-black/15 px-3 text-sm font-black disabled:opacity-40"
                 >
-                  Precedent
+                  {text.previous}
                 </button>
                 <span className="grid h-10 min-w-10 place-items-center rounded-md bg-black px-3 text-sm font-black text-white">
                   {safeProductPage}/{totalProductPages}
@@ -517,7 +776,7 @@ export default function Home() {
                   disabled={safeProductPage === totalProductPages}
                   className="h-10 rounded-md border border-black/15 px-3 text-sm font-black disabled:opacity-40"
                 >
-                  Suivant
+                  {text.next}
                 </button>
               </div>
             </div>
@@ -528,7 +787,7 @@ export default function Home() {
       <section id="checkout" className="border-t border-black/10 bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.85fr_1.15fr]">
           <aside className="h-fit rounded-md border border-black/10 p-4">
-            <h2 className="text-2xl font-black">Panier</h2>
+            <h2 className="text-2xl font-black">{text.cart}</h2>
             <div className="mt-5 divide-y divide-black/10">
               {cartItems.length ? (
                 cartItems.map((item) => (
@@ -541,13 +800,13 @@ export default function Home() {
                       <p className="text-sm text-black/55">
                         {item.product.price
                           ? formatPrice(item.product.price)
-                          : "Prix sur demande"}
+                          : text.priceOnRequest}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        aria-label="Diminuer"
+                        aria-label={language === "fr" ? "Diminuer" : "Decrease"}
                         onClick={() => updateCart(item.product.id, item.quantity - 1)}
                         className="grid size-8 place-items-center rounded-md border border-black/15"
                       >
@@ -556,7 +815,7 @@ export default function Home() {
                       <span className="w-6 text-center font-bold">{item.quantity}</span>
                       <button
                         type="button"
-                        aria-label="Augmenter"
+                        aria-label={language === "fr" ? "Augmenter" : "Increase"}
                         onClick={() => updateCart(item.product.id, item.quantity + 1)}
                         className="grid size-8 place-items-center rounded-md border border-black/15"
                       >
@@ -564,7 +823,7 @@ export default function Home() {
                       </button>
                       <button
                         type="button"
-                        aria-label="Supprimer"
+                        aria-label={language === "fr" ? "Supprimer" : "Remove"}
                         onClick={() => updateCart(item.product.id, 0)}
                         className="grid size-8 place-items-center rounded-md border border-black/15 text-red-700"
                       >
@@ -574,17 +833,17 @@ export default function Home() {
                   </div>
                 ))
               ) : (
-                <p className="py-5 text-sm text-black/55">Le panier est vide.</p>
+                <p className="py-5 text-sm text-black/55">{text.emptyCart}</p>
               )}
             </div>
             <div className="mt-4 space-y-2 border-t border-black/10 pt-4 text-sm">
               <div className="flex justify-between">
-                <span>Sous-total</span>
+                <span>{text.subtotal}</span>
                 <strong>{formatPrice(subtotal)}</strong>
               </div>
               <div className="flex justify-between">
-                <span>Livraison</span>
-                <strong>{shipping ? formatPrice(shipping) : "Offerte"}</strong>
+                <span>{text.shipping}</span>
+                <strong>{shipping ? formatPrice(shipping) : text.free}</strong>
               </div>
               <div className="flex justify-between text-xl font-black">
                 <span>Total</span>
@@ -598,22 +857,20 @@ export default function Home() {
               <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--theme-accent-dark)]">
                 Checkout
               </p>
-              <h2 className="mt-1 text-2xl font-black">Informations client</h2>
+              <h2 className="mt-1 text-2xl font-black">{text.customerInfo}</h2>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Input name="name" label="Nom complet" required />
-              <Input name="phone" label="Telephone" required />
-              <Input name="email" label="Email" type="email" required />
-              <Input name="city" label="Ville" required />
+              <Input name="name" label={text.name} required />
+              <Input name="phone" label={text.phone} required />
+              <Input name="email" label={text.email} type="email" required />
+              <Input name="city" label={text.city} required />
             </div>
-            <Input name="address" label="Adresse de livraison" required />
+            <Input name="address" label={text.address} required />
 
             <div className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-4">
-              <p className="font-black">Commande par contact WhatsApp</p>
+              <p className="font-black">{text.contactOrder}</p>
               <p className="mt-2 text-sm leading-6 text-black/60">
-                Apres validation, la commande est enregistree et WhatsApp
-                s'ouvre avec le resume pret a envoyer au vendeur. Le paiement
-                se confirme ensuite directement avec lui.
+                {text.contactText}
               </p>
             </div>
 
@@ -623,7 +880,7 @@ export default function Home() {
               className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-5 font-black text-white transition hover:bg-[var(--theme-deep)] disabled:opacity-60"
             >
               <ShieldCheck size={18} />
-              {isSending ? "Preparation..." : "Contacter sur WhatsApp"}
+              {isSending ? text.sending : text.contactWhatsapp}
             </button>
             {status ? <p className="text-sm font-semibold text-[var(--theme-deep)]">{status}</p> : null}
           </form>
@@ -635,11 +892,11 @@ export default function Home() {
           <div className="grid gap-10 md:grid-cols-[1fr_1fr_1.35fr]">
             <div>
               <h2 className="text-sm font-black uppercase tracking-[0.18em]">
-                Main Menu
+                {text.mainMenu}
               </h2>
               <nav className="mt-6 grid gap-4 text-sm text-white/68">
                 <a href="#" className="w-fit hover:text-white">Home</a>
-                <a href="#boutique" className="w-fit hover:text-white">Shop</a>
+                <a href="#boutique" className="w-fit hover:text-white">{text.navShop}</a>
                 <a href="#checkout" className="w-fit hover:text-white">Contact</a>
                 <a href="#legal" className="w-fit hover:text-white">FAQ</a>
               </nav>
@@ -647,7 +904,7 @@ export default function Home() {
 
             <div>
               <h2 className="text-sm font-black uppercase tracking-[0.18em]">
-                Footer Menu
+                {text.footerMenu}
               </h2>
               <nav className="mt-6 grid gap-4 text-sm text-white/68">
                 <a href="#boutique" className="w-fit hover:text-white">Search</a>
@@ -660,16 +917,15 @@ export default function Home() {
 
             <div>
               <h2 className="text-sm font-black uppercase tracking-[0.18em]">
-                Sign Up And Save
+                {text.signup}
               </h2>
               <p className="mt-6 max-w-sm text-sm leading-6 text-white/68">
-                Recevez les nouveautes, les alertes catalogue et les offres
-                disponibles directement par email.
+                {text.signupText}
               </p>
               <label className="mt-5 flex h-12 max-w-sm items-center rounded-md border border-white/85 px-4">
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={text.emailPlaceholder}
                   className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/58"
                 />
                 <Mail size={21} className="text-white/70" />
@@ -679,8 +935,7 @@ export default function Home() {
 
           <div className="mt-10 text-center text-xs leading-6 text-white/58">
             <p>
-              Copyright 2026 BIP PEPTIDE. Boutique specialisee avec catalogue
-              selectionne, contact direct et accompagnement client.
+              {text.footerLine}
             </p>
           </div>
         </div>
@@ -706,7 +961,7 @@ function buildWhatsappMessage(
     .join("\n");
 
   return [
-    "Bonjour, je veux finaliser cette commande BIP PEPTIDE.",
+    "Bonjour, je veux finaliser cette commande BIP HORIZON.",
     orderId ? `Reference: ${orderId}` : "",
     "",
     `Nom: ${customer.name}`,

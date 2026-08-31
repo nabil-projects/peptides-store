@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { defaultProducts, type Product } from "@/data/products";
+import { isSupabaseConfigured, supabaseRequest } from "@/lib/supabase-rest";
 
 const dataDir = path.join(process.cwd(), "data");
 const productsFile = path.join(dataDir, "products.json");
@@ -11,19 +12,57 @@ type ProductInput = Partial<Product> & {
   name?: string;
 };
 
+type ProductRow = {
+  id: string;
+  name: string;
+  category: Product["category"];
+  price: number;
+  old_price: number | null;
+  unit: string;
+  rating: number | null;
+  stock: Product["stock"];
+  description: string;
+  image: string | null;
+  badge: string | null;
+};
+
+let hasSeededProducts = false;
+
 export async function getProducts() {
-  try {
-    const raw = await readFile(productsFile, "utf8");
-    const parsed = JSON.parse(raw) as Product[];
-    return parsed.map(normalizeProduct).filter(Boolean) as Product[];
-  } catch {
-    return defaultProducts;
+  if (isSupabaseConfigured()) {
+    try {
+      const rows = await supabaseRequest<ProductRow[]>("products", {
+        query: { select: "*", order: "created_at.desc" },
+      });
+
+      if (!rows.length && !hasSeededProducts) {
+        hasSeededProducts = true;
+        await seedDefaultProducts();
+        return defaultProducts;
+      }
+
+      return rows.map(fromProductRow).filter(Boolean) as Product[];
+    } catch (error) {
+      console.warn(error);
+      return getLocalProducts();
+    }
   }
+
+  return getLocalProducts();
 }
 
 export async function saveProducts(products: Product[]) {
-  await mkdir(dataDir, { recursive: true });
-  await writeFile(productsFile, `${JSON.stringify(products, null, 2)}\n`, "utf8");
+  if (isSupabaseConfigured()) {
+    await supabaseRequest("products", {
+      method: "POST",
+      query: { on_conflict: "id" },
+      prefer: "resolution=merge-duplicates",
+      body: products.map(toProductRow),
+    });
+    return;
+  }
+
+  await saveLocalProducts(products);
 }
 
 export async function createProduct(input: ProductInput) {
@@ -37,39 +76,124 @@ export async function createProduct(input: ProductInput) {
     throw new Error("Produit invalide.");
   }
 
+  if (isSupabaseConfigured()) {
+    const rows = await supabaseRequest<ProductRow[]>("products", {
+      method: "POST",
+      prefer: "return=representation",
+      body: toProductRow(product),
+    });
+    return fromProductRow(rows[0]) as Product;
+  }
+
   const nextProducts = [product, ...products];
-  await saveProducts(nextProducts);
+  await saveLocalProducts(nextProducts);
   return product;
 }
 
 export async function updateProduct(id: string, input: ProductInput) {
   const products = await getProducts();
-  const index = products.findIndex((product) => product.id === id);
+  const existingProduct = products.find((product) => product.id === id);
 
-  if (index === -1) {
+  if (!existingProduct) {
     return null;
   }
 
-  const product = normalizeProduct({ ...products[index], ...input, id });
+  const product = normalizeProduct({ ...existingProduct, ...input, id });
   if (!product) {
     throw new Error("Produit invalide.");
   }
 
+  if (isSupabaseConfigured()) {
+    const rows = await supabaseRequest<ProductRow[]>("products", {
+      method: "PATCH",
+      query: { id: `eq.${id}` },
+      prefer: "return=representation",
+      body: toProductRow(product),
+    });
+    return rows[0] ? (fromProductRow(rows[0]) as Product) : null;
+  }
+
+  const index = products.findIndex((entry) => entry.id === id);
   products[index] = product;
-  await saveProducts(products);
+  await saveLocalProducts(products);
   return product;
 }
 
 export async function deleteProduct(id: string) {
   const products = await getProducts();
-  const nextProducts = products.filter((product) => product.id !== id);
 
-  if (nextProducts.length === products.length) {
+  if (!products.some((product) => product.id === id)) {
     return false;
   }
 
-  await saveProducts(nextProducts);
+  if (isSupabaseConfigured()) {
+    await supabaseRequest("products", {
+      method: "DELETE",
+      query: { id: `eq.${id}` },
+    });
+    return true;
+  }
+
+  await saveLocalProducts(products.filter((product) => product.id !== id));
   return true;
+}
+
+async function seedDefaultProducts() {
+  await supabaseRequest("products", {
+    method: "POST",
+    query: { on_conflict: "id" },
+    prefer: "resolution=ignore-duplicates",
+    body: defaultProducts.map(toProductRow),
+  });
+}
+
+async function getLocalProducts() {
+  try {
+    const raw = await readFile(productsFile, "utf8");
+    const parsed = JSON.parse(raw) as Product[];
+    return parsed.map(normalizeProduct).filter(Boolean) as Product[];
+  } catch {
+    return defaultProducts;
+  }
+}
+
+async function saveLocalProducts(products: Product[]) {
+  await mkdir(dataDir, { recursive: true });
+  await writeFile(productsFile, `${JSON.stringify(products, null, 2)}\n`, "utf8");
+}
+
+function toProductRow(product: Product) {
+  return {
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    old_price: product.oldPrice ?? null,
+    unit: product.unit,
+    rating: product.rating ?? null,
+    stock: product.stock,
+    description: product.description,
+    image: product.image || "/catalog-hero.png",
+    badge: product.badge ?? null,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+function fromProductRow(row?: ProductRow) {
+  if (!row) return null;
+  return normalizeProduct({
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    price: row.price,
+    oldPrice: row.old_price ?? undefined,
+    unit: row.unit,
+    rating: row.rating ?? undefined,
+    stock: row.stock,
+    description: row.description,
+    image: row.image || "/catalog-hero.png",
+    badge: row.badge ?? undefined,
+  });
 }
 
 function normalizeProduct(input: ProductInput) {

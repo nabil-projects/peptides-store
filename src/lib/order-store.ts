@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { Product } from "@/data/products";
+import { isSupabaseConfigured, supabaseRequest } from "@/lib/supabase-rest";
 
 const dataDir = path.join(process.cwd(), "data");
 const ordersFile = path.join(dataDir, "orders.json");
@@ -42,6 +43,28 @@ export type StoredOrder = {
   total: number;
 };
 
+type OrderRow = {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  status: OrderStatus;
+  payment_method: "whatsapp";
+  customer: StoredOrder["customer"];
+  subtotal: number;
+  shipping: number;
+  total: number;
+  order_items?: OrderItemRow[];
+};
+
+type OrderItemRow = {
+  order_id: string;
+  product_id: string;
+  name: string;
+  unit: string;
+  quantity: number;
+  price: number;
+};
+
 const orderStatuses: OrderStatus[] = [
   "pending_payment",
   "paid",
@@ -49,17 +72,22 @@ const orderStatuses: OrderStatus[] = [
 ];
 
 export async function getOrders() {
-  try {
-    const raw = await readFile(ordersFile, "utf8");
-    const parsed = JSON.parse(raw) as StoredOrder[];
-    return parsed.map(normalizeStoredOrder).filter(Boolean) as StoredOrder[];
-  } catch {
-    return [];
+  if (isSupabaseConfigured()) {
+    try {
+      const rows = await supabaseRequest<OrderRow[]>("orders", {
+        query: { select: "*,order_items(*)", order: "created_at.desc" },
+      });
+      return rows.map(fromOrderRow).filter(Boolean) as StoredOrder[];
+    } catch (error) {
+      console.warn(error);
+      return getLocalOrders();
+    }
   }
+
+  return getLocalOrders();
 }
 
 export async function createOrderRecord(order: OrderInput, products: Product[]) {
-  const orders = await getOrders();
   const now = new Date().toISOString();
   const items = order.items.map((item) => {
     const product = products.find((entry) => entry.id === item.productId);
@@ -95,7 +123,22 @@ export async function createOrderRecord(order: OrderInput, products: Product[]) 
     total: subtotal + shipping,
   };
 
-  await saveOrders([storedOrder, ...orders]);
+  if (isSupabaseConfigured()) {
+    await supabaseRequest("orders", {
+      method: "POST",
+      prefer: "return=minimal",
+      body: toOrderRow(storedOrder),
+    });
+    await supabaseRequest("order_items", {
+      method: "POST",
+      prefer: "return=minimal",
+      body: storedOrder.items.map((item) => toOrderItemRow(storedOrder.id, item)),
+    });
+    return storedOrder;
+  }
+
+  const orders = await getLocalOrders();
+  await saveLocalOrders([storedOrder, ...orders]);
   return storedOrder;
 }
 
@@ -104,7 +147,21 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
     throw new Error("Statut invalide.");
   }
 
-  const orders = await getOrders();
+  if (isSupabaseConfigured()) {
+    await supabaseRequest("orders", {
+      method: "PATCH",
+      query: { id: `eq.${id}` },
+      prefer: "return=minimal",
+      body: {
+        status,
+        updated_at: new Date().toISOString(),
+      },
+    });
+    const orders = await getOrders();
+    return orders.find((order) => order.id === id) || null;
+  }
+
+  const orders = await getLocalOrders();
   const index = orders.findIndex((order) => order.id === id);
 
   if (index === -1) {
@@ -116,25 +173,90 @@ export async function updateOrderStatus(id: string, status: OrderStatus) {
     status,
     updatedAt: new Date().toISOString(),
   };
-  await saveOrders(orders);
+  await saveLocalOrders(orders);
   return orders[index];
 }
 
 export async function deleteOrder(id: string) {
-  const orders = await getOrders();
+  if (isSupabaseConfigured()) {
+    await supabaseRequest("orders", {
+      method: "DELETE",
+      query: { id: `eq.${id}` },
+    });
+    return true;
+  }
+
+  const orders = await getLocalOrders();
   const nextOrders = orders.filter((order) => order.id !== id);
 
   if (nextOrders.length === orders.length) {
     return false;
   }
 
-  await saveOrders(nextOrders);
+  await saveLocalOrders(nextOrders);
   return true;
 }
 
-async function saveOrders(orders: StoredOrder[]) {
+async function getLocalOrders() {
+  try {
+    const raw = await readFile(ordersFile, "utf8");
+    const parsed = JSON.parse(raw) as StoredOrder[];
+    return parsed.map(normalizeStoredOrder).filter(Boolean) as StoredOrder[];
+  } catch {
+    return [];
+  }
+}
+
+async function saveLocalOrders(orders: StoredOrder[]) {
   await mkdir(dataDir, { recursive: true });
   await writeFile(ordersFile, `${JSON.stringify(orders, null, 2)}\n`, "utf8");
+}
+
+function toOrderRow(order: StoredOrder) {
+  return {
+    id: order.id,
+    created_at: order.createdAt,
+    updated_at: order.updatedAt,
+    status: order.status,
+    payment_method: order.paymentMethod,
+    customer: order.customer,
+    subtotal: order.subtotal,
+    shipping: order.shipping,
+    total: order.total,
+  };
+}
+
+function toOrderItemRow(orderId: string, item: StoredOrder["items"][number]) {
+  return {
+    order_id: orderId,
+    product_id: item.productId,
+    name: item.name,
+    unit: item.unit,
+    quantity: item.quantity,
+    price: item.price,
+  };
+}
+
+function fromOrderRow(row?: OrderRow) {
+  if (!row) return null;
+  return normalizeStoredOrder({
+    id: row.id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    status: row.status,
+    paymentMethod: "whatsapp",
+    customer: row.customer,
+    items: (row.order_items || []).map((item) => ({
+      productId: item.product_id,
+      name: item.name,
+      unit: item.unit,
+      quantity: item.quantity,
+      price: item.price,
+    })),
+    subtotal: row.subtotal,
+    shipping: row.shipping,
+    total: row.total,
+  });
 }
 
 function normalizeStoredOrder(order: StoredOrder) {

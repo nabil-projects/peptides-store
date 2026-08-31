@@ -502,7 +502,7 @@ export default function AdminPage() {
               <ArrowLeft size={16} />
               Retour boutique
             </a>
-            <h1 className="mt-2 text-3xl font-black">Admin BIP PEPTIDE</h1>
+            <h1 className="mt-2 text-3xl font-black">Admin BIP HORIZON</h1>
           </div>
           {activeTab === "products" ? (
             <button
