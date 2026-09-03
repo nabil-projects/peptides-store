@@ -983,24 +983,39 @@ function buildWhatsappMessage(
   total: number,
 ) {
   const products = cartItems
-    .map((item) => `- ${item.product.name} x${item.quantity} (${formatPrice(item.product.price)})`)
-    .join("\n");
+    .map((item) =>
+      [
+        `- ${item.product.name}`,
+        `  Quantité: ${item.quantity}`,
+        `  Prix unitaire: ${formatPrice(item.product.price)}`,
+        `  Sous-total: ${formatPrice(item.product.price * item.quantity)}`,
+      ].join("\n"),
+    )
+    .join("\n\n");
 
   return [
-    "Bonjour, je veux finaliser cette commande BIP HORIZON.",
-    orderId ? `Reference: ${orderId}` : "",
+    "Bonjour,",
     "",
+    "Je souhaite finaliser la commande suivante.",
+    "",
+    "COMMANDE",
+    orderId ? `Référence: ${orderId}` : "",
+    `Total: ${formatPrice(total)}`,
+    "",
+    "CLIENT",
     `Nom: ${customer.name}`,
     `Téléphone: ${customer.phone}`,
     `Email: ${customer.email}`,
     `Ville: ${customer.city}`,
     `Adresse: ${customer.address}`,
-    `Publicité: ${customer.referralSource || "Non"}`,
     "",
-    "Produits:",
+    "PROVENANCE",
+    `Publicité / Collaborateur: ${customer.referralSource || "Non"}`,
+    "",
+    "PRODUITS",
     products,
     "",
-    `Total: ${formatPrice(total)}`,
+    "Merci.",
   ]
     .filter(Boolean)
     .join("\n");

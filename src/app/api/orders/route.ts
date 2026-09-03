@@ -48,7 +48,11 @@ function buildOrderText(order: OrderRequest, products: Product[]) {
   const orderItems = getOrderItems(order, products);
   const lines = orderItems.map((item) => {
     const price = item.product?.price ? formatPrice(item.product.price) : "devis";
-    return `- ${item.product?.name ?? "Produit inconnu"} x${item.quantity} (${price})`;
+    return [
+      `- ${item.product?.name ?? "Produit inconnu"}`,
+      `  Quantité: ${item.quantity}`,
+      `  Prix unitaire: ${price}`,
+    ].join("\n");
   });
 
   const total = orderItems.reduce(
@@ -57,23 +61,28 @@ function buildOrderText(order: OrderRequest, products: Product[]) {
   );
 
   return [
-    "Nouvelle commande",
+    "Nouvelle commande BIP HORIZON",
     "",
-    "Contact: WhatsApp",
+    "COMMANDE",
+    `Contact: WhatsApp`,
     `Total produits: ${formatPrice(total)}`,
+    "",
+    "CLIENT",
     "",
     `Nom: ${order.customer.name}`,
     `Téléphone: ${order.customer.phone}`,
     `Email: ${order.customer.email || "non renseigné"}`,
     `Ville: ${order.customer.city || "non renseignée"}`,
     `Adresse: ${order.customer.address || "non renseignée"}`,
-    `Publicité: ${order.customer.referralSource || "non"}`,
     "",
-    "Produits:",
+    "PROVENANCE",
+    `Publicité / Collaborateur: ${order.customer.referralSource || "Non"}`,
+    "",
+    "PRODUITS",
     ...lines,
     "",
     `Message: ${order.customer.message || "aucun"}`,
-  ].join("\n");
+  ].join("\n\n");
 }
 
 async function sendOrderEmail(order: OrderRequest, products: Product[]) {
