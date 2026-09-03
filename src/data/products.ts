@@ -1,7 +1,7 @@
 ﻿export type Product = {
   id: string;
   name: string;
-  category: "Peptides" | "Accessoires" | "Packs" | "Nutrition";
+  category: string;
   price: number;
   oldPrice?: number;
   unit: string;
@@ -162,4 +162,5 @@ export const defaultProducts: Product[] = [
 
 export const products = defaultProducts;
 
-export const categories = ["Tous", "Peptides", "Accessoires", "Packs", "Nutrition"] as const;
+export const defaultCategories = ["Peptides", "Accessoires", "Packs", "Nutrition"] as const;
+export const categories = ["Tous", ...defaultCategories] as const;

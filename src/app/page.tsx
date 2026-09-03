@@ -16,11 +16,11 @@ import {
   Truck,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { categories, defaultProducts, type Product } from "@/data/products";
+import { categories as defaultCategoryOptions, defaultProducts, type Product } from "@/data/products";
 import { formatPrice } from "@/lib/money";
 
 type Cart = Record<string, number>;
-type Category = (typeof categories)[number];
+type Category = string;
 type SortMode = "featured" | "price-asc" | "price-desc";
 type Language = "fr" | "en";
 const productsPerPage = 6;
@@ -191,6 +191,7 @@ export default function Home() {
   const [language, setLanguage] = useState<Language>("fr");
   const [cart, setCart] = useState<Cart>({});
   const [category, setCategory] = useState<Category>("Tous");
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([...defaultCategoryOptions]);
   const [sort, setSort] = useState<SortMode>("featured");
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState<Product[]>(defaultProducts);
@@ -235,11 +236,21 @@ export default function Home() {
 
     async function loadProducts() {
       try {
-        const response = await fetch("/api/products");
-        const result = await response.json();
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/categories"),
+        ]);
+        const result = await productsResponse.json();
+        const categoriesResult = await categoriesResponse.json();
 
         if (isMounted && Array.isArray(result.products)) {
           setProducts(result.products);
+        }
+        if (isMounted && Array.isArray(categoriesResult.categories)) {
+          const names = categoriesResult.categories
+            .map((entry: { name?: string }) => String(entry.name || "").trim())
+            .filter(Boolean);
+          setCategoryOptions(["Tous", ...names]);
         }
       } finally {
         if (isMounted) {
@@ -656,7 +667,7 @@ export default function Home() {
               {text.categories}
             </h3>
             <div className="grid gap-2">
-              {categories.map((item) => (
+              {categoryOptions.map((item) => (
                 <button
                   key={item}
                   type="button"

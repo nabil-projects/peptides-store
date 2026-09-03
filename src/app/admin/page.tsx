@@ -3,6 +3,7 @@
 import {
   ArrowLeft,
   BadgeEuro,
+  Boxes,
   ClipboardList,
   ImagePlus,
   PackagePlus,
@@ -11,11 +12,12 @@ import {
   Plus,
   Save,
   Search,
+  Tags,
   Trash2,
   Upload,
 } from "lucide-react";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
-import { categories, type Product } from "@/data/products";
+import { categories as defaultCategoryOptions, type Product } from "@/data/products";
 import { formatPrice } from "@/lib/money";
 
 type FormState = Omit<Product, "id" | "oldPrice" | "rating" | "badge"> & {
@@ -66,6 +68,13 @@ type GuideFormState = {
   videoUrl: string;
 };
 
+type ProductCategory = {
+  id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 const emptyForm: FormState = {
   name: "",
   category: "Peptides",
@@ -84,7 +93,7 @@ const emptyGuideForm: GuideFormState = {
   videoUrl: "",
 };
 
-const editableCategories = categories.filter((category) => category !== "Tous");
+const fallbackCategories = defaultCategoryOptions.filter((category) => category !== "Tous");
 const stockOptions = [
   { value: "in-stock", label: "En stock" },
   { value: "preorder", label: "Précommande" },
@@ -105,11 +114,16 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<StoredOrder[]>([]);
   const [guides, setGuides] = useState<GuideVideo[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [guideForm, setGuideForm] = useState<GuideFormState>(emptyGuideForm);
+  const [categoryForm, setCategoryForm] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedGuideId, setSelectedGuideId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"orders" | "products">("orders");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"orders" | "products" | "stock" | "categories">(
+    "orders",
+  );
   const [productSearch, setProductSearch] = useState("");
   const [status, setStatus] = useState("");
   const [password, setPassword] = useState("");
@@ -143,9 +157,15 @@ export default function AdminPage() {
     );
   }, [productSearch, products]);
 
+  const editableCategories = useMemo(() => {
+    const names = categories.map((category) => category.name);
+    return names.length ? names : fallbackCategories;
+  }, [categories]);
+
   useEffect(() => {
     checkSession();
     loadProducts();
+    loadCategories();
   }, []);
 
   async function checkSession() {
@@ -157,6 +177,7 @@ export default function AdminPage() {
     if (authenticated) {
       await loadOrders();
       await loadGuides();
+      await loadCategories();
     }
   }
 
@@ -181,12 +202,19 @@ export default function AdminPage() {
     setStatus("");
     await loadOrders();
     await loadGuides();
+    await loadCategories();
   }
 
   async function loadProducts() {
     const response = await fetch("/api/products");
     const result = await response.json();
     setProducts(Array.isArray(result.products) ? result.products : []);
+  }
+
+  async function loadCategories() {
+    const response = await fetch("/api/categories");
+    const result = await response.json();
+    setCategories(Array.isArray(result.categories) ? result.categories : []);
   }
 
   async function loadOrders() {
@@ -423,6 +451,105 @@ export default function AdminPage() {
     setStatus("Produit supprimé.");
   }
 
+  async function changeProductStock(product: Product, stock: Product["stock"]) {
+    const response = await fetch(`/api/products/${product.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...product, stock }),
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
+      setStatus(result.message || "Modification du stock impossible.");
+      return;
+    }
+
+    await loadProducts();
+    setStatus("Stock modifié.");
+  }
+
+  function editCategory(category: ProductCategory) {
+    setSelectedCategoryId(category.id);
+    setCategoryForm(category.name);
+    setStatus("");
+  }
+
+  function resetCategoryForm() {
+    setSelectedCategoryId(null);
+    setCategoryForm("");
+    setStatus("");
+  }
+
+  async function saveCategory(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmedName = categoryForm.trim();
+    const selectedCategory = categories.find((category) => category.id === selectedCategoryId);
+    const previousName = selectedCategory?.name;
+    const url = selectedCategoryId ? `/api/categories/${selectedCategoryId}` : "/api/categories";
+    const response = await fetch(url, {
+      method: selectedCategoryId ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: trimmedName }),
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
+      setStatus(result.message || "Enregistrement de la catégorie impossible.");
+      return;
+    }
+
+    if (previousName && previousName !== trimmedName) {
+      await Promise.all(
+        products
+          .filter((product) => product.category === previousName)
+          .map((product) =>
+            fetch(`/api/products/${product.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...product, category: trimmedName }),
+            }),
+          ),
+      );
+    }
+
+    await loadCategories();
+    await loadProducts();
+    resetCategoryForm();
+    setStatus(selectedCategoryId ? "Catégorie modifiée." : "Catégorie ajoutée.");
+  }
+
+  async function removeCategory(category: ProductCategory) {
+    if (products.some((product) => product.category === category.name)) {
+      setStatus("Cette catégorie contient encore des produits.");
+      return;
+    }
+
+    if (!window.confirm(`Supprimer la catégorie ${category.name} ?`)) return;
+
+    const response = await fetch(`/api/categories/${category.id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        setIsAuthenticated(false);
+      }
+      setStatus(result.message || "Suppression de catégorie impossible.");
+      return;
+    }
+
+    await loadCategories();
+    resetCategoryForm();
+    setStatus("Catégorie supprimée.");
+  }
+
   async function removeGuide(guide: GuideVideo) {
     if (!window.confirm(`Supprimer ${guide.title} ?`)) return;
 
@@ -505,10 +632,20 @@ export default function AdminPage() {
               Nouveau produit
             </button>
           ) : null}
+          {activeTab === "categories" ? (
+            <button
+              type="button"
+              onClick={resetCategoryForm}
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-ink)] px-4 text-sm font-bold text-white"
+            >
+              <Tags size={18} />
+              Nouvelle catégorie
+            </button>
+          ) : null}
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-7xl gap-2 px-4 pt-6 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap gap-2 px-4 pt-6 sm:px-6">
         <button
           type="button"
           onClick={() => setActiveTab("orders")}
@@ -529,6 +666,26 @@ export default function AdminPage() {
           <PackagePlus size={18} />
           Produits ({products.length})
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("stock")}
+          className={`inline-flex h-11 items-center gap-2 rounded-md px-4 text-sm font-black ${
+            activeTab === "stock" ? "bg-black text-white" : "border border-black/15 bg-white"
+          }`}
+        >
+          <Boxes size={18} />
+          Stock
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("categories")}
+          className={`inline-flex h-11 items-center gap-2 rounded-md px-4 text-sm font-black ${
+            activeTab === "categories" ? "bg-black text-white" : "border border-black/15 bg-white"
+          }`}
+        >
+          <Tags size={18} />
+          Catégories ({editableCategories.length})
+        </button>
       </div>
 
       {activeTab === "orders" ? (
@@ -537,6 +694,21 @@ export default function AdminPage() {
           onStatusChange={changeOrderStatus}
           onDelete={removeOrder}
           onRefresh={loadOrders}
+        />
+      ) : activeTab === "stock" ? (
+        <StockPanel products={products} onStockChange={changeProductStock} />
+      ) : activeTab === "categories" ? (
+        <CategoriesPanel
+          categories={categories}
+          products={products}
+          categoryForm={categoryForm}
+          selectedCategoryId={selectedCategoryId}
+          status={status}
+          onSubmit={saveCategory}
+          onChange={setCategoryForm}
+          onEdit={editCategory}
+          onDelete={removeCategory}
+          onReset={resetCategoryForm}
         />
       ) : (
       <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr]">
@@ -778,6 +950,200 @@ function loadImage(file: File) {
     };
     image.src = url;
   });
+}
+
+function StockPanel({
+  products,
+  onStockChange,
+}: {
+  products: Product[];
+  onStockChange: (product: Product, stock: Product["stock"]) => void;
+}) {
+  const counts = stockOptions.map((option) => ({
+    ...option,
+    count: products.filter((product) => product.stock === option.value).length,
+  }));
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <div className="mb-5 grid gap-3 sm:grid-cols-3">
+        {counts.map((item) => (
+          <div key={item.value} className="rounded-md border border-black/10 bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
+              {item.label}
+            </p>
+            <p className="mt-2 text-3xl font-black">{item.count}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-md border border-black/10 bg-white">
+        <div className="border-b border-black/10 p-4">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
+            Gestion de stock
+          </p>
+          <h2 className="mt-1 text-xl font-black">Stock par produit</h2>
+        </div>
+        <div className="divide-y divide-black/10">
+          {products.map((product) => (
+            <article
+              key={product.id}
+              className="grid gap-4 p-4 md:grid-cols-[82px_1fr_240px]"
+            >
+              <img
+                src={product.image || "/catalog-hero.png"}
+                alt={product.name}
+                className="aspect-square w-full rounded-md object-cover md:w-[82px]"
+              />
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-[var(--theme-accent-dark)]">
+                  {product.category}
+                </p>
+                <h3 className="mt-1 font-black">{product.name}</h3>
+                <p className="mt-1 text-sm text-black/55">
+                  {formatPrice(product.price)} · {product.unit}
+                </p>
+              </div>
+              <Select
+                label="État du stock"
+                value={product.stock}
+                options={stockOptions}
+                onChange={(value) => onStockChange(product, value as Product["stock"])}
+              />
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CategoriesPanel({
+  categories,
+  products,
+  categoryForm,
+  selectedCategoryId,
+  status,
+  onSubmit,
+  onChange,
+  onEdit,
+  onDelete,
+  onReset,
+}: {
+  categories: ProductCategory[];
+  products: Product[];
+  categoryForm: string;
+  selectedCategoryId: string | null;
+  status: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onChange: (value: string) => void;
+  onEdit: (category: ProductCategory) => void;
+  onDelete: (category: ProductCategory) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.92fr_1.08fr]">
+      <section className="rounded-md border border-black/10 bg-white p-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--theme-accent-dark)]">
+              Catégories
+            </p>
+            <h2 className="text-xl font-black">{categories.length} catégories</h2>
+          </div>
+          <Tags className="text-[var(--theme-accent-dark)]" size={26} />
+        </div>
+
+        <div className="grid gap-3">
+          {categories.map((category) => {
+            const productCount = products.filter(
+              (product) => product.category === category.name,
+            ).length;
+
+            return (
+              <article
+                key={category.id}
+                className={`grid gap-3 rounded-md border p-3 sm:grid-cols-[1fr_auto] ${
+                  selectedCategoryId === category.id
+                    ? "border-[var(--theme-accent-dark)] bg-[var(--theme-accent-soft)]"
+                    : "border-black/10"
+                }`}
+              >
+                <div>
+                  <h3 className="font-black">{category.name}</h3>
+                  <p className="mt-1 text-sm text-black/55">
+                    {productCount} produit{productCount > 1 ? "s" : ""}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onEdit(category)}
+                    className="grid size-9 place-items-center rounded-md border border-black/15"
+                    aria-label="Modifier"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(category)}
+                    className="grid size-9 place-items-center rounded-md border border-black/15 text-red-700 disabled:opacity-35"
+                    disabled={productCount > 0}
+                    aria-label="Supprimer"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <form onSubmit={onSubmit} className="h-fit rounded-md border border-black/10 bg-white p-4">
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--theme-accent-dark)]">
+              Édition
+            </p>
+            <h2 className="text-xl font-black">
+              {selectedCategoryId ? "Modifier la catégorie" : "Ajouter une catégorie"}
+            </h2>
+          </div>
+          <button
+            type="submit"
+            className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-black text-white"
+          >
+            {selectedCategoryId ? <Save size={18} /> : <Plus size={18} />}
+            Enregistrer
+          </button>
+        </div>
+
+        <div className="grid gap-4">
+          <Input
+            label="Nom de la catégorie"
+            value={categoryForm}
+            onChange={onChange}
+            required
+          />
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={onReset}
+              className="inline-flex h-10 items-center rounded-md border border-black/15 px-3 text-sm font-black"
+            >
+              Nouvelle catégorie
+            </button>
+          </div>
+          <p className="rounded-md bg-[var(--theme-mist)] p-3 text-xs font-semibold leading-5 text-black/55">
+            Une catégorie utilisée par un produit ne peut pas être supprimée. Modifie
+            d'abord les produits concernés ou change leur catégorie.
+          </p>
+          {status ? <p className="text-sm font-bold text-[var(--theme-deep)]">{status}</p> : null}
+        </div>
+      </form>
+    </div>
+  );
 }
 
 function GuidesPanel({

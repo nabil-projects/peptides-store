@@ -1,7 +1,14 @@
+create table if not exists public.product_categories (
+  id text primary key,
+  name text not null unique,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.products (
   id text primary key,
   name text not null,
-  category text not null check (category in ('Peptides', 'Accessoires', 'Packs', 'Nutrition')),
+  category text not null,
   price numeric not null default 0 check (price >= 0),
   old_price numeric check (old_price is null or old_price >= 0),
   unit text not null,
@@ -36,6 +43,31 @@ create table if not exists public.order_items (
   price numeric not null default 0 check (price >= 0),
   created_at timestamptz not null default now()
 );
+
+do $$
+declare
+  constraint_name text;
+begin
+  select conname
+  into constraint_name
+  from pg_constraint
+  where conrelid = 'public.products'::regclass
+    and contype = 'c'
+    and pg_get_constraintdef(oid) like '%category%'
+    and pg_get_constraintdef(oid) like '%Peptides%';
+
+  if constraint_name is not null then
+    execute format('alter table public.products drop constraint %I', constraint_name);
+  end if;
+end $$;
+
+insert into public.product_categories (id, name)
+values
+  ('peptides', 'Peptides'),
+  ('accessoires', 'Accessoires'),
+  ('packs', 'Packs'),
+  ('nutrition', 'Nutrition')
+on conflict (id) do nothing;
 
 create index if not exists orders_created_at_idx on public.orders(created_at desc);
 create index if not exists order_items_order_id_idx on public.order_items(order_id);

@@ -1,11 +1,11 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { defaultProducts, type Product } from "@/data/products";
+import { defaultCategories, defaultProducts, type Product } from "@/data/products";
 import { isSupabaseConfigured, supabaseRequest } from "@/lib/supabase-rest";
 
 const dataDir = path.join(process.cwd(), "data");
 const productsFile = path.join(dataDir, "products.json");
-const categories = ["Peptides", "Accessoires", "Packs", "Nutrition"] as const;
+const fallbackCategory = defaultCategories[0];
 const stockStates = ["in-stock", "preorder", "notify"] as const;
 
 type ProductInput = Partial<Product> & {
@@ -15,7 +15,7 @@ type ProductInput = Partial<Product> & {
 type ProductRow = {
   id: string;
   name: string;
-  category: Product["category"];
+  category: string;
   price: number;
   old_price: number | null;
   unit: string;
@@ -200,11 +200,7 @@ function normalizeProduct(input: ProductInput) {
   const name = String(input.name || "").trim();
   const unit = String(input.unit || "").trim();
   const description = String(input.description || "").trim();
-  const category: Product["category"] = categories.includes(
-    input.category as (typeof categories)[number],
-  )
-    ? (input.category as Product["category"])
-    : "Peptides";
+  const category = String(input.category || fallbackCategory).trim() || fallbackCategory;
   const stock: Product["stock"] = stockStates.includes(
     input.stock as (typeof stockStates)[number],
   )
