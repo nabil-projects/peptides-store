@@ -514,7 +514,7 @@ export default function Home() {
             <a href="#checkout" className="hover:text-black">
               {text.navCart}
             </a>
-            <a href="#legal" className="hover:text-black">
+            <a href="/conditions-generales-vente" className="hover:text-black">
               {text.navTerms}
             </a>
           </nav>
@@ -898,7 +898,7 @@ export default function Home() {
                 <a href="#" className="w-fit hover:text-white">Home</a>
                 <a href="#boutique" className="w-fit hover:text-white">{text.navShop}</a>
                 <a href="#checkout" className="w-fit hover:text-white">Contact</a>
-                <a href="#legal" className="w-fit hover:text-white">FAQ</a>
+                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions legales</a>
               </nav>
             </div>
 
@@ -909,9 +909,9 @@ export default function Home() {
               <nav className="mt-6 grid gap-4 text-sm text-white/68">
                 <a href="#boutique" className="w-fit hover:text-white">Search</a>
                 <a href="#" className="w-fit hover:text-white">About Us</a>
-                <a href="#legal" className="w-fit hover:text-white">Terms of Service</a>
-                <a href="#legal" className="w-fit hover:text-white">Privacy Policy</a>
-                <a href="#legal" className="w-fit hover:text-white">Refund Policy</a>
+                <a href="/conditions-generales-vente" className="w-fit hover:text-white">Conditions generales de vente</a>
+                <a href="/politique-confidentialite" className="w-fit hover:text-white">Politique de confidentialite</a>
+                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions legales</a>
               </nav>
             </div>
 

@@ -1,0 +1,234 @@
+﻿Conditions Générales de Vente — BIP HORIZON
+
+Version [1.1] — En vigueur au [JJ/MM/AAAA]
+
+Préambule — Identité du vendeur
+
+BIP HORIZON, [entreprise individuelle] exploitée par [MAK SING]
+Siège social : 5830 E 2nd St, Ste 7000 #37577, Casper, WY 82609, États-Unis
+[Numéro d'immatriculation : SIREN [•] / Wyoming Business ID [•]]
+[N° de TVA intracommunautaire : [•] — ou : TVA non applicable, art. 293 B du CGI (franchise en base)]
+Adresse d'expédition et de retour : [adresse en France métropolitaine]
+Courriel : bip-horizon@proton.me — Directeur de la publication : [•]
+Hébergeur du site : [nom, adresse, téléphone]
+
+Article 1 — Objet et champ d'application
+
+Les présentes conditions générales de vente (les « CGV ») régissent l'ensemble des ventes conclues à distance, via le site bip-horizon.com, entre BIP HORIZON (le « Vendeur ») et tout acheteur (le « Client »).
+
+Le Client déclare avoir pris connaissance des présentes CGV et les avoir acceptées, par une case à cocher distincte, avant la validation de sa commande. Cette acceptation est sans réserve.
+
+Les CGV applicables sont celles en vigueur à la date de passation de la commande. Le Vendeur se réserve le droit de les modifier à tout moment ; les modifications ne s'appliquent pas aux commandes déjà validées.
+
+Si une clause des présentes venait à être déclarée nulle ou inapplicable, les autres clauses conserveraient leur pleine valeur.
+
+Article 2 — Produits, destination et garanties de l'acheteur
+
+2.1 — Nature des produits. Les produits commercialisés par le Vendeur sont des peptides destinés exclusivement à la recherche scientifique in vitro et au développement en laboratoire.
+
+2.2 — Interdictions d'usage. Ces produits ne sont en aucun cas destinés à un usage humain ou vétérinaire, in vivo, thérapeutique, diagnostique, préventif, alimentaire, complémentaire, cosmétique ou sportif. Ils ne constituent ni des médicaments, ni des dispositifs médicaux, ni des denrées alimentaires, ni des compléments alimentaires, ni des produits cosmétiques, et n'ont fait l'objet d'aucune évaluation ou autorisation à ce titre.
+
+2.3 — Déclarations du Client. En validant sa commande, le Client déclare et garantit :
+
+qu'il est majeur et dispose de la capacité juridique de contracter ;
+qu'il acquiert les produits en vue d'une utilisation exclusivement en recherche in vitro ;
+qu'il dispose des compétences, équipements et installations nécessaires à leur manipulation en sécurité ;
+qu'il respectera l'ensemble des réglementations applicables dans son pays, notamment en matière d'importation, de détention, de manipulation, de stockage et d'élimination de substances chimiques ;
+qu'il ne revendra pas les produits en vue d'un usage humain ou animal.
+
+2.4 — Refus de commande. Le Vendeur se réserve le droit de refuser ou d'annuler toute commande, notamment en cas de doute sérieux sur la destination des produits, de restriction réglementaire dans le pays de livraison, de litige antérieur, ou de suspicion de fraude. La commande annulée est intégralement remboursée.
+
+2.5 — Documentation. Les fiches produits, certificats d'analyse et fiches de données de sécurité (FDS) sont [disponibles sur la fiche produit / communiqués sur demande à bip-horizon@proton.me]. Les photographies et descriptifs sont fournis à titre indicatif et n'entrent pas dans le champ contractuel s'agissant de l'aspect visuel du conditionnement.
+
+Article 3 — Prix
+
+3.1 Les prix sont indiqués en euros (€), net de taxe, hors frais de livraison. TVA non applicable, article 293 B du Code général des impôts (franchise en base de TVA).
+
+3.2 Les frais de livraison sont indiqués au Client avant la validation définitive de sa commande.
+
+3.3 Le Vendeur peut modifier ses prix à tout moment. Le prix applicable est celui affiché sur le site au moment de la validation de la commande.
+
+3.4 — Livraisons hors Union européenne (Suisse). Les prix s'entendent hors droits de douane, taxes à l'importation et frais de dédouanement, qui restent à la charge exclusive du Client et sont exigibles par les autorités du pays de destination. Le Client est seul responsable de la conformité de l'importation au regard de la réglementation locale.
+
+Article 4 — Commande, paiement et archivage
+
+4.1 — Processus. La commande est passée en ligne. Avant de la valider, le Client dispose d'un récapitulatif détaillé lui permettant de vérifier le contenu de son panier, le prix total, les frais de livraison et de corriger d'éventuelles erreurs. La validation par un double clic vaut acceptation ferme et définitive.
+
+4.2 — Confirmation. Le Vendeur adresse au Client, par courriel et sans délai injustifié, un accusé de réception de la commande récapitulant ses éléments essentiels. Le contrat est formé à la réception de cette confirmation.
+
+4.3 — Paiement. Le prix est exigible en totalité au jour de la commande. Le paiement s'effectue par carte bancaire via le prestataire de paiement sécurisé Stripe (Apple Pay et Google Pay disponibles selon l'appareil). Aucune donnée bancaire n'est collectée ni conservée par le Vendeur.
+
+4.4 — Réserve de propriété. Les produits demeurent la propriété du Vendeur jusqu'au complet encaissement du prix. Le transfert des risques intervient conformément à l'article 5.5.
+
+4.5 — Archivage. Conformément à l'article L213-1 du Code de la consommation, les contrats d'un montant égal ou supérieur à 120 € sont archivés par le Vendeur pendant dix (10) ans à compter de la livraison. Le Client peut en demander copie à bip-horizon@proton.me.
+
+Article 5 — Livraison
+
+5.1 — Zones. Les produits sont expédiés depuis la France métropolitaine à destination de la France métropolitaine, de la Belgique, du Luxembourg, de Monaco et de la Suisse.
+
+5.2 — Frais. Les frais de livraison s'élèvent à 7 €. La livraison est offerte pour toute commande d'un montant égal ou supérieur à 200 € [hors frais de port]. [Préciser si un tarif spécifique s'applique à la Suisse.]
+
+5.3 — Délais. Le Vendeur s'engage à expédier la commande au plus tard vingt (20) jours à compter de la conclusion du contrat. Le délai d'acheminement par le transporteur s'ajoute à ce délai et est indiqué à titre indicatif lors de la commande.
+
+5.4 — Retard. Conformément aux articles L216-2 et L216-3 du Code de la consommation, en cas de manquement à la date de livraison convenue, le Client consommateur peut enjoindre le Vendeur d'exécuter dans un délai supplémentaire raisonnable, puis, à défaut, résoudre le contrat par lettre recommandée ou par écrit sur support durable. La résolution est acquise à la réception de cet écrit, sauf exécution entre-temps. Le Vendeur rembourse alors la totalité des sommes versées au plus tard dans les quatorze (14) jours suivant la résolution.
+
+5.5 — Transfert des risques. Conformément à l'article L216-4 du Code de la consommation, les risques de perte ou d'endommagement sont transférés au Client consommateur au moment où il prend physiquement possession du produit. Lorsque le Client choisit lui-même un transporteur autre que ceux proposés par le Vendeur, le transfert intervient à la remise au transporteur.
+
+5.6 — Réception. Il est recommandé au Client de vérifier l'état du colis à la réception, d'émettre le cas échéant des réserves précises auprès du transporteur, et d'informer le Vendeur à bip-horizon@proton.me dans les meilleurs délais. Ces réserves ne conditionnent pas l'exercice des garanties légales.
+
+5.7 — Force majeure. Le Vendeur ne saurait être tenu responsable des retards ou de l'inexécution résultant d'un cas de force majeure au sens de l'article 1218 du Code civil, ou d'un fait imputable au transporteur ou aux autorités douanières, sans préjudice des droits du Client au titre de l'article 5.4.
+
+Article 5 bis — Articles en précommande
+
+5 bis.1 Certaines références sont proposées en précommande : elles ne sont pas en stock au moment de la commande et sont réapprovisionnées à la demande. Ce statut est signalé sur la fiche produit et rappelé dans le panier avant paiement.
+
+5 bis.2 La commande est confirmée et payée immédiatement, puis expédiée dès réception du réapprovisionnement, dans la limite du délai de vingt (20) jours mentionné à l'article 5.3. Le dépassement de ce délai ouvre au Client les droits prévus à l'article 5.4.
+
+5 bis.3 Une commande comportant au moins un article en précommande est expédiée en un seul envoi, une fois l'ensemble des références disponibles. Le Client souhaitant recevoir séparément les articles disponibles peut en faire la demande à bip-horizon@proton.me ; [des frais de livraison supplémentaires de [•] € pourront alors s'appliquer / aucun frais supplémentaire ne sera facturé].
+
+5 bis.4 Le droit de rétractation prévu à l'article 6 s'applique aux articles en précommande dans les mêmes conditions, le délai courant à compter de la réception effective des produits.
+
+Article 6 — Droit de rétractation
+
+6.1 — Principe. Conformément à l'article L221-18 du Code de la consommation, le Client consommateur dispose d'un délai de quatorze (14) jours pour exercer son droit de rétractation sans avoir à motiver sa décision ni à supporter d'autres coûts que ceux prévus à l'article 6.4. Ce délai court à compter de la réception du dernier produit de la commande.
+
+6.2 — Modalités. Le Client notifie sa décision par une déclaration dénuée d'ambiguïté adressée à bip-horizon@proton.me, ou au moyen du formulaire type de rétractation figurant en annexe des présentes.
+
+6.3 — Retour. Les produits sont renvoyés à l'adresse [adresse de retour en France] au plus tard quatorze (14) jours après la notification, dans leur emballage d'origine, non ouverts, non descellés, et dans des conditions de conservation appropriées (chaîne du froid maintenue). Le Client est invité à utiliser un mode d'expédition suivi.
+
+6.4 — Frais de retour. Les frais directs de renvoi sont à la charge du Client.
+
+6.5 — Remboursement. Le Vendeur rembourse la totalité des sommes versées, y compris les frais de livraison standard initiaux, au plus tard quatorze (14) jours à compter de la récupération des produits ou de la fourniture par le Client d'une preuve de leur expédition, la date retenue étant celle du premier de ces faits. Le remboursement est effectué par le même moyen de paiement, sauf accord exprès contraire.
+
+6.6 — Exception liée à l'hygiène et à la santé. Conformément à l'article L221-28, 4° du Code de la consommation, le droit de rétractation ne peut être exercé pour les biens qui ont été descellés après la livraison et qui ne peuvent être renvoyés pour des raisons d'hygiène ou de protection de la santé. En raison de la nature des produits (substances chimiques conditionnées sous scellé, conservation sous température dirigée), tout produit ouvert, descellé, ou dont l'intégrité et la chaîne du froid ne peuvent être vérifiées ne pourra donc être repris. Cette exception est rappelée au Client avant la validation de la commande.
+
+6.7 — Dépréciation. La responsabilité du Client peut être engagée en cas de dépréciation des produits résultant de manipulations autres que celles nécessaires pour établir leur nature et leurs caractéristiques.
+
+6.8 — Clients professionnels. Le droit de rétractation ne bénéficie pas aux Clients agissant à des fins professionnelles, sous réserve de l'article L221-3 du Code de la consommation.
+
+Article 7 — Garanties légales
+
+Le Vendeur est tenu des défauts de conformité du bien dans les conditions des articles L217-3 et suivants du Code de la consommation et des vices cachés dans les conditions des articles 1641 à 1649 du Code civil.
+
+Encadré d'information (article D211-2 du Code de la consommation)
+
+Le consommateur dispose d'un délai de deux ans à compter de la délivrance du bien pour obtenir la mise en œuvre de la garantie légale de conformité en cas d'apparition d'un défaut de conformité. Durant ce délai, le consommateur n'est tenu d'établir que l'existence du défaut de conformité et non la date d'apparition de celui-ci.
+
+La garantie légale de conformité emporte obligation de fournir toutes les mises à jour nécessaires au maintien de la conformité du bien.
+
+Elle donne au consommateur droit à la réparation ou au remplacement du bien dans un délai de trente jours suivant sa demande, sans frais et sans inconvénient majeur pour lui.
+
+Si le bien est réparé dans le cadre de la garantie légale de conformité, le consommateur bénéficie d'une extension de six mois de la garantie initiale.
+
+Si le consommateur demande la réparation du bien, mais que le vendeur impose le remplacement, la garantie légale de conformité est renouvelée pour une période de deux ans à compter de la date de remplacement du bien.
+
+Le consommateur peut obtenir une réduction du prix d'achat en conservant le bien ou mettre fin au contrat en se faisant rembourser intégralement contre restitution du bien, si :
+1° Le professionnel refuse de réparer ou de remplacer le bien ;
+2° La réparation ou le remplacement du bien intervient après un délai de trente jours ;
+3° La réparation ou le remplacement du bien occasionne un inconvénient majeur pour le consommateur, notamment lorsque le consommateur supporte définitivement les frais de reprise ou d'enlèvement du bien non conforme, ou s'il supporte les frais d'installation du bien réparé ou de remplacement ;
+4° La non-conformité du bien persiste en dépit de la tentative de mise en conformité du vendeur restée infructueuse.
+
+Le consommateur a également droit à une réduction du prix du bien ou à la résolution du contrat lorsque le défaut de conformité est si grave qu'il justifie que la réduction du prix ou la résolution du contrat soit immédiate. Le consommateur n'est alors pas tenu de demander la réparation ou le remplacement du bien au préalable.
+
+Le consommateur n'a pas droit à la résolution de la vente si le défaut de conformité est mineur.
+
+Toute période d'immobilisation du bien en vue de sa réparation ou de son remplacement suspend la garantie qui restait à courir jusqu'à la délivrance du bien remis en état.
+
+Les droits mentionnés ci-dessus résultent de l'application des articles L. 217-1 à L. 217-32 du code de la consommation.
+
+Le vendeur qui fait obstacle de mauvaise foi à la mise en œuvre de la garantie légale de conformité encourt une amende civile d'un montant maximal de 300 000 euros, qui peut être porté jusqu'à 10 % du chiffre d'affaires moyen annuel (article L. 241-5 du code de la consommation).
+
+Le consommateur bénéficie également de la garantie légale des vices cachés en application des articles 1641 à 1649 du code civil, pendant une durée de deux ans à compter de la découverte du défaut, sans pouvoir excéder vingt ans à compter de la délivrance du bien. Cette garantie donne droit à une réduction de prix si le bien est conservé ou à un remboursement intégral contre restitution du bien.
+
+Pour mettre en œuvre ces garanties : bip-horizon@proton.me.
+
+Ces garanties ne couvrent pas les défauts résultant d'une conservation, d'une manipulation ou d'une utilisation non conformes aux instructions du Vendeur ou aux règles de l'art en laboratoire, ni d'un usage contraire à l'article 2.
+
+Article 8 — Responsabilité
+
+8.1 Le Vendeur est responsable de plein droit de la bonne exécution des obligations résultant du contrat, dans les conditions de l'article L221-15 du Code de la consommation, sauf lorsque l'inexécution est imputable au Client, au fait imprévisible et insurmontable d'un tiers étranger au contrat, ou à un cas de force majeure.
+
+8.2 Le Vendeur ne saurait être tenu responsable des dommages, de quelque nature que ce soit, résultant d'un usage des produits non conforme à leur destination de recherche in vitro définie à l'article 2, notamment de tout usage humain ou animal, lequel engage la seule responsabilité du Client.
+
+8.3 À l'égard des Clients professionnels, et sauf faute lourde ou dolosive, la responsabilité du Vendeur est limitée au montant hors taxes de la commande concernée et exclut tout dommage indirect (perte d'exploitation, perte de données, perte de chance).
+
+8.4 Aucune stipulation des présentes n'a pour effet de limiter ou d'exclure la responsabilité du Vendeur en cas de dommage corporel, de faute dolosive ou lourde, ni de porter atteinte aux droits que le Client consommateur tient des dispositions impératives du Code de la consommation.
+
+Article 9 — Données personnelles
+
+Les données personnelles collectées sont traitées conformément à la Politique de confidentialité accessible à [URL]. Le Client dispose de droits d'accès, de rectification, d'effacement, de limitation, de portabilité et d'opposition, exerçables à bip-horizon@proton.me.
+
+Article 10 — Réclamations et médiation de la consommation
+
+10.1 — Réclamation préalable. Toute réclamation doit être adressée au service client par écrit à bip-horizon@proton.me. Le Vendeur s'efforce d'y répondre sous [•] jours ouvrés.
+
+10.2 — Médiation. Conformément aux articles L612-1 et L616-1 du Code de la consommation, le Client consommateur peut recourir gratuitement au médiateur de la consommation ci-après, après avoir tenté de résoudre le litige par une réclamation écrite auprès du Vendeur :
+
+[Nom du médiateur ou de l'entité de médiation]
+[Adresse postale] — [site internet] — [formulaire de saisine en ligne]
+
+La saisine doit intervenir dans un délai d'un an à compter de la réclamation écrite adressée au Vendeur.
+
+[Le Vendeur doit adhérer à un dispositif de médiation et publier ici les coordonnées du médiateur : cette information est obligatoire et son absence est sanctionnée par une amende administrative (art. L641-1 C. conso.).]
+
+10.3 — Litiges transfrontaliers. Le Client résidant dans un autre État membre de l'Union européenne peut s'adresser au Centre européen des consommateurs France (www.europe-consommateurs.eu). (La plateforme européenne de règlement en ligne des litiges a définitivement cessé de fonctionner le 20 juillet 2025 : toute référence à celle-ci doit être supprimée des CGV.)
+
+Article 11 — Propriété intellectuelle
+
+L'ensemble des éléments du site (textes, visuels, logos, fiches produits, base de données) est protégé par le droit de la propriété intellectuelle et demeure la propriété exclusive du Vendeur ou de ses ayants droit. Toute reproduction ou exploitation non autorisée est interdite.
+
+Article 12 — Droit applicable et juridiction compétente
+
+12.1 Les présentes CGV et les contrats qui en découlent sont soumis au droit français.
+
+12.2 Conformément à l'article 6 du règlement (CE) n° 593/2008 (Rome I), le Client consommateur résidant dans un autre État de l'Union européenne conserve le bénéfice des dispositions impératives protectrices du droit de son pays de résidence.
+
+12.3 À défaut de résolution amiable, le Client consommateur peut saisir, à son choix, la juridiction du lieu de son domicile ou celle du lieu de livraison, conformément à l'article R631-3 du Code de la consommation et au règlement (UE) n° 1215/2012.
+
+12.4 Pour les Clients professionnels, compétence exclusive est attribuée aux tribunaux de [ville], nonobstant pluralité de défendeurs ou appel en garantie.
+
+12.5 Les présentes CGV sont rédigées en langue française, seule version faisant foi.
+
+Annexe — Formulaire type de rétractation
+
+(À compléter et renvoyer uniquement si vous souhaitez vous rétracter du contrat.)
+
+À l'attention de BIP HORIZON — [adresse de retour] — bip-horizon@proton.me
+
+Je/nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la vente du bien ci-dessous :
+
+Commandé le (*) / reçu le (*) : ……………………
+Numéro de commande : ……………………
+Nom du (des) consommateur(s) : ……………………
+Adresse du (des) consommateur(s) : ……………………
+Signature (uniquement en cas de notification sur papier) : ……………………
+Date : ……………………
+
+(*) Rayez la mention inutile.
+
+Ce que j'ai ajouté ou corrigé
+
+Ajouts obligatoires qui manquaient — leur absence est directement sanctionnée :
+
+Garanties légales (art. 7) : l'encadré de l'article D211-2 est obligatoire pour tout vendeur en ligne à des consommateurs. C'était l'omission la plus lourde.
+Formulaire type de rétractation en annexe (art. R221-1) : obligatoire, et son absence porte le délai de rétractation de 14 jours à 12 mois (L221-20).
+Délai de remboursement de 14 jours, point de départ du délai, charge des frais de retour, sort des frais de livraison initiaux.
+Fondement de votre exclusion de retour : votre clause « produits non ouverts » n'était rattachée à aucun texte. Je l'ai ancrée dans l'art. L221-28, 4° (biens descellés, hygiène/santé), ce qui la rend opposable.
+Coordonnées du médiateur : « seront publiées prochainement » n'est pas conforme. L'adhésion à un médiateur est obligatoire, à régulariser avant mise en ligne.
+Plateforme ODR supprimée : elle a définitivement fermé le 20 juillet 2025 (règlement (UE) 2024/3228). Le lien devenait un signal de CGV non maintenues.
+Transfert des risques, réserve de propriété, archivage du contrat, force majeure, propriété intellectuelle, langue, divisibilité, hébergeur, directeur de publication.
+
+Corrections :
+
+« BIP HORIZON Labs » (art. 7 d'origine) — dénomination différente du reste du document. Uniformisée.
+Limitation de responsabilité : « limitée au montant de la commande » sans réserve est présumée abusive à l'égard d'un consommateur (art. R212-1). Réservée aux clients professionnels, avec exclusion du dommage corporel.
+Juridiction : « les juridictions françaises seront seules compétentes » est inopposable à un consommateur belge, suisse ou luxembourgeois. Remplacée par les règles Rome I / Bruxelles I bis.
+Suisse : ajout des droits de douane et de la TVA à l'importation à la charge du client — sinon vous vous exposez à des litiges systématiques.
+Précommande : ajout du point de départ du délai de rétractation et de la question des frais de port en cas d'envoi scindé, qui n'était pas tranchée.
+Trois points de fond à trancher avant publication
+
+1. Le siège au Wyoming contre le régime fiscal français. L'adresse de Casper (5830 E 2nd St) est une adresse de domiciliation d'agent enregistré. Une entité du Wyoming ne peut pas relever de la franchise en base de l'article 293 B du CGI, qui suppose un établissement en France. Par ailleurs, « entreprise individuelle » est une notion de droit français qui ne correspond à aucune forme juridique du Wyoming. Il faut choisir : soit vous êtes établi en France (et vous indiquez un SIREN, une adresse française et le RCS), soit vous êtes une société américaine (et le régime TVA applicable est celui des ventes à distance vers l'UE, avec immatriculation IOSS/OSS ou représentation fiscale au-delà de 10 000 € de ventes B2C dans l'UE). En l'état, un contrôle ou un client contentieux exploiterait cette incohérence immédiatement. À noter aussi : les seuils actuels de franchise sont de 85 000 € (biens) / 37 500 € (services), avec tolérance à 93 500 € / 41 250 €.
+
+2. Vendeur hors UE et sécurité des produits. Le règlement (UE) 2023/988 sur la sécurité générale des produits interdit de mettre sur le marché de l'UE un produit relevant de son champ sans opérateur économique responsable établi dans l'UE, dont le nom et l'adresse doivent être indiqués. Si vous expédiez depuis la France, cet établissement existe peut-être déjà — il faut alors l'afficher. La mention « usage recherche uniquement » ne dispense pas non plus des obligations REACH/CLP d'étiquetage et de fiches de données de sécurité.
+
+3. Le risque le plus sérieux : vendre des peptides de recherche à des particuliers. La clause « usage in vitro uniquement » est nécessaire mais elle ne suffit pas juridiquement. Si les produits sont, par leur présentation ou leur fonction, assimilables à des médicaments (art. L5111-1 CSP), la vente hors circuit pharmaceutique relève de l'exercice illégal de la pharmacie (L4223-1 CSP) — et le fait que vos clients soient des particuliers plutôt que des laboratoires est précisément l'élément que la DGCCRF ou l'ANSM retiendrait. Deux mesures réduisent l'exposition : vérifier la qualité de professionnel/laboratoire du client à l'inscription (n° SIRET, nom de l'établissement de recherche) plutôt que de vous contenter d'une case à cocher, et écarter les références figurant sur la liste des interdictions de l'AMA ou identifiées comme substances actives.

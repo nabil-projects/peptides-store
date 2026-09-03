@@ -1,0 +1,125 @@
+﻿Politique de confidentialité — BIP HORIZON
+
+Dernière mise à jour : [JJ/MM/AAAA]
+
+1. Objet
+
+La présente politique décrit la manière dont BIP HORIZON collecte, utilise, conserve et protège vos données à caractère personnel dans le cadre de l'utilisation du site bip-horizon.com, conformément au Règlement (UE) 2016/679 (« RGPD ») et à la loi n° 78-17 du 6 janvier 1978 modifiée (« Informatique et Libertés »).
+
+2. Responsable du traitement
+
+Le responsable du traitement est :
+
+BIP HORIZON, [forme juridique] au capital de [montant] €
+Siège social : [adresse complète]
+[SIREN / RCS de …]
+Courriel : bip-horizon@proton.me
+
+BIP HORIZON [a désigné / n'a pas désigné] de délégué à la protection des données (DPO). [Si oui, indiquer ses coordonnées ou son adresse de contact dédiée.]
+
+3. Données collectées
+
+Nous collectons uniquement les données nécessaires aux finalités décrites ci-dessous.
+
+Catégorie	Données concernées	Origine
+Identification	Nom, prénom	Fournies par vous
+Coordonnées	Adresse email, adresse de livraison, adresse de facturation, [numéro de téléphone]	Fournies par vous
+Commande	Produits commandés, montant, date, historique, numéro de commande	Générées par votre commande
+Paiement	Statut de la transaction, [4 derniers chiffres de la carte]. Nous ne stockons aucune donnée bancaire complète : celles-ci sont traitées directement par notre prestataire de paiement [nom].	Prestataire de paiement
+Compte	Identifiant, mot de passe (stocké sous forme chiffrée/hachée)	Fournies par vous
+Techniques	Adresse IP, type de navigateur, pages consultées, identifiants de session	Collectées automatiquement
+Communications	Contenu de vos échanges avec le service client	Fournies par vous
+
+Les champs obligatoires sont signalés lors de la collecte. À défaut de les renseigner, nous ne pourrons pas traiter votre commande ou créer votre compte.
+
+4. Finalités et bases légales
+Finalité	Base légale	Durée de conservation
+Traitement et suivi des commandes, livraison, service après-vente	Exécution du contrat (art. 6.1.b)	5 ans à compter de la fin de la relation contractuelle
+Gestion du compte client	Exécution du contrat (art. 6.1.b)	Jusqu'à suppression du compte, puis suppression sous [30] jours. Un compte inactif pendant 3 ans est supprimé après information préalable.
+Facturation et obligations comptables	Obligation légale (art. 6.1.c — art. L123-22 C. com.)	10 ans
+Prévention et détection de la fraude	Intérêt légitime (art. 6.1.f)	[13] mois
+Réponse aux demandes via le formulaire de contact	Intérêt légitime (art. 6.1.f)	3 ans après le dernier contact
+Envoi de la newsletter et communications marketing	Consentement (art. 6.1.a)	Jusqu'au retrait du consentement, puis 3 ans maximum
+Mesure d'audience et statistiques	Consentement (art. 6.1.a)	Voir article 9
+Gestion des demandes d'exercice de droits	Obligation légale (art. 6.1.c)	1 an (3 ans en cas de pièce d'identité pour contentieux)
+
+Lorsque le traitement repose sur l'intérêt légitime, celui-ci consiste à sécuriser nos activités, prévenir les impayés et les usages frauduleux, et améliorer nos services. Vous pouvez à tout moment vous y opposer (voir article 8).
+
+5. Destinataires des données
+
+Vos données sont accessibles uniquement aux personnes habilitées de BIP HORIZON, ainsi qu'aux prestataires suivants, agissant en qualité de sous-traitants et liés par contrat conforme à l'article 28 du RGPD :
+
+Hébergement du site : [nom de l'hébergeur, adresse, pays]
+Solution e-commerce / CMS : [nom]
+Paiement en ligne : [nom du prestataire]
+Transporteurs et logistique : [noms]
+Emailing / newsletter : [nom]
+Mesure d'audience : [nom]
+
+Vos données peuvent également être transmises aux autorités administratives ou judiciaires lorsque la loi l'exige.
+
+Nous ne vendons ni ne louons vos données personnelles à des tiers.
+
+6. Transferts hors de l'Union européenne
+
+[Option A — si aucun transfert :] L'ensemble de vos données est hébergé et traité au sein de l'Union européenne. Aucun transfert hors UE n'est réalisé.
+
+[Option B — si transferts :] Certains de nos prestataires sont situés hors de l'Union européenne ([pays]). Ces transferts sont encadrés par [une décision d'adéquation de la Commission européenne / les clauses contractuelles types de la Commission européenne], assorties de mesures supplémentaires appropriées. Une copie de ces garanties peut être obtenue sur demande à bip-horizon@proton.me.
+
+7. Sécurité
+
+Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre la destruction, la perte, l'altération, la divulgation ou l'accès non autorisés, notamment : chiffrement des communications (HTTPS/TLS), hachage des mots de passe, contrôle et journalisation des accès, sauvegardes régulières, et sensibilisation des personnes habilitées.
+
+En cas de violation de données susceptible d'engendrer un risque élevé pour vos droits et libertés, vous en serez informé dans les meilleurs délais, conformément à l'article 34 du RGPD.
+
+8. Vos droits
+
+Conformément aux articles 15 à 22 du RGPD, vous disposez des droits suivants :
+
+Accès : obtenir la confirmation que vos données sont traitées et en recevoir une copie.
+Rectification : faire corriger des données inexactes ou incomplètes.
+Effacement : demander la suppression de vos données, dans les limites de nos obligations légales de conservation.
+Limitation du traitement dans les cas prévus par le RGPD.
+Portabilité : recevoir les données que vous nous avez fournies dans un format structuré et lisible par machine.
+Opposition au traitement fondé sur l'intérêt légitime, pour des raisons tenant à votre situation particulière, et à tout moment et sans motif en matière de prospection commerciale.
+Retrait du consentement à tout moment, sans que cela n'affecte la licéité du traitement effectué avant le retrait.
+Directives post-mortem : définir des directives relatives au sort de vos données après votre décès.
+
+Comment exercer vos droits : par courriel à bip-horizon@proton.me, ou par courrier à [adresse postale]. Nous répondons dans un délai d'un mois, prolongeable de deux mois en cas de demande complexe (vous en seriez alors informé). En cas de doute raisonnable sur votre identité, un justificatif pourra vous être demandé.
+
+Réclamation : si vous estimez que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la CNIL — 3 place de Fontenoy, TSA 80715, 75334 Paris Cedex 07 — ou via www.cnil.fr.
+
+Pour vous désabonner de la newsletter, un lien de désinscription figure dans chacun de nos emails.
+
+9. Cookies et traceurs
+
+Un cookie est un fichier déposé sur votre terminal lors de la visite d'un site. Lors de votre première visite, un bandeau vous permet d'accepter ou de refuser, finalité par finalité, les traceurs non essentiels. Vous pouvez modifier vos choix à tout moment via le lien « Gérer mes cookies » présent en pied de page.
+
+Type	Finalité	Consentement requis	Durée
+Cookies strictement nécessaires	Session, panier, authentification, sécurité	Non	Session à [13] mois
+Mesure d'audience	Statistiques de fréquentation et d'usage	Oui (sauf configuration exemptée au sens de la CNIL)	13 mois max. (données brutes : 25 mois max.)
+[Marketing / publicité, le cas échéant]	[Personnalisation, retargeting]	Oui	13 mois max.
+
+Le refus des cookies non essentiels n'empêche pas l'accès au site. Vous pouvez également configurer votre navigateur pour bloquer ou supprimer les cookies ; le blocage des cookies nécessaires peut en revanche dégrader le fonctionnement du site (panier, connexion).
+
+Votre choix (acceptation ou refus) est conservé [6] mois, à l'issue desquels le bandeau vous sera de nouveau présenté.
+
+10. Mineurs
+
+Le site n'est pas destiné aux personnes de moins de 15 ans. Nous ne collectons pas sciemment de données concernant des mineurs de moins de 15 ans sans le consentement du titulaire de l'autorité parentale. Si vous constatez qu'une telle collecte a eu lieu, contactez-nous afin que nous procédions à la suppression.
+
+11. Décision automatisée
+
+Aucune décision produisant des effets juridiques à votre égard n'est prise sur le seul fondement d'un traitement automatisé, y compris le profilage. [À adapter si un outil anti-fraude automatisé est utilisé.]
+
+12. Modifications
+
+Cette politique peut être modifiée pour tenir compte d'évolutions légales, techniques ou de nos services. La version applicable est celle publiée sur le site à la date de votre visite. En cas de modification substantielle, nous vous en informerons par un moyen approprié (bandeau sur le site ou email).
+
+13. Contact
+
+Pour toute question relative à cette politique ou au traitement de vos données : bip-horizon@proton.me — [adresse postale].
+
+Ce qui a été ajouté par rapport à votre version : identification complète du responsable, tableau des catégories de données, correspondance finalité / base légale / durée (au lieu de listes séparées), destinataires et sous-traitants, transferts hors UE, mesures de sécurité et notification de violation, droits de limitation et de retrait du consentement, droit de réclamation auprès de la CNIL, délai de réponse, mineurs, décision automatisée, modalités de mise à jour, et détail des cookies.
+
+Deux points à trancher : le paiement (confirmez que vous ne stockez aucune donnée bancaire) et les transferts hors UE (dépend de votre hébergeur et de votre outil d'emailing — Google Analytics ou Mailchimp, par exemple, imposent l'option B). Je ne suis pas juriste : pour un site marchand, une relecture par un professionnel avant publication reste recommandée.
