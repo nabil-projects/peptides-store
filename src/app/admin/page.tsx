@@ -42,6 +42,7 @@ type StoredOrder = {
     city?: string;
     address?: string;
     message?: string;
+    referralSource?: string;
   };
   items: Array<{
     productId: string;
@@ -1418,6 +1419,7 @@ function OrdersPanel({
                       <p>{order.customer.email || "Email non renseigne"}</p>
                       <p>{order.customer.city || "Ville non renseignee"}</p>
                       <p>{order.customer.address || "Adresse non renseignée"}</p>
+                      <p>Publicité: {order.customer.referralSource || "Non"}</p>
                       {order.customer.message ? <p>Message: {order.customer.message}</p> : null}
                     </div>
                     <div className="rounded-md bg-[var(--theme-mist)] p-3 text-sm leading-6">

@@ -17,6 +17,7 @@ export type OrderInput = {
     city?: string;
     address?: string;
     message?: string;
+    referralSource?: string;
   };
   items: Array<{
     productId: string;
@@ -116,6 +117,7 @@ export async function createOrderRecord(order: OrderInput, products: Product[]) 
       city: String(order.customer.city || "").trim(),
       address: String(order.customer.address || "").trim(),
       message: String(order.customer.message || "").trim(),
+      referralSource: String(order.customer.referralSource || "").trim(),
     },
     items,
     subtotal,

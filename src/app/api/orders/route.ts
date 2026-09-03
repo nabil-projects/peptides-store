@@ -19,6 +19,7 @@ type OrderRequest = {
     city?: string;
     address?: string;
     message?: string;
+    referralSource?: string;
   };
   items: OrderItem[];
 };
@@ -66,6 +67,7 @@ function buildOrderText(order: OrderRequest, products: Product[]) {
     `Email: ${order.customer.email || "non renseigné"}`,
     `Ville: ${order.customer.city || "non renseignée"}`,
     `Adresse: ${order.customer.address || "non renseignée"}`,
+    `Publicité: ${order.customer.referralSource || "non"}`,
     "",
     "Produits:",
     ...lines,

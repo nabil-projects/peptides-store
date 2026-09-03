@@ -24,6 +24,7 @@ type SortMode = "featured" | "price-asc" | "price-desc";
 type Language = "fr" | "en";
 const productsPerPage = 6;
 const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "";
+const collaborators = ["Habib", "Omar", "Maxi", "Nora", "Dods"];
 
 const copy = {
   fr: {
@@ -85,6 +86,8 @@ const copy = {
     email: "Email",
     city: "Ville",
     address: "Adresse de livraison",
+    referralQuestion: "Je viens d'une publicité",
+    referralSelect: "Choisir le collaborateur",
     contactOrder: "Commande par contact WhatsApp",
     contactText:
       "Après validation, la commande est enregistrée et WhatsApp s'ouvre avec le résumé prêt à envoyer au vendeur. Le paiement se confirme ensuite directement avec lui.",
@@ -159,6 +162,8 @@ const copy = {
     email: "Email",
     city: "City",
     address: "Delivery address",
+    referralQuestion: "I came from an ad",
+    referralSelect: "Choose collaborator",
     contactOrder: "Order by WhatsApp contact",
     contactText:
       "After confirmation, the order is saved and WhatsApp opens with a summary ready to send to the seller. Payment is then confirmed directly with them.",
@@ -194,6 +199,8 @@ export default function Home() {
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [status, setStatus] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [hasReferralSource, setHasReferralSource] = useState(false);
+  const [referralSource, setReferralSource] = useState(collaborators[0]);
   const [isAccessConfirmed, setIsAccessConfirmed] = useState(false);
   const [isAccessChecked, setIsAccessChecked] = useState(false);
   const text = copy[language];
@@ -344,6 +351,7 @@ export default function Home() {
     }
 
     const form = new FormData(checkoutForm);
+    const selectedReferralSource = hasReferralSource ? referralSource : "";
     setIsSending(true);
 
     const response = await fetch("/api/orders", {
@@ -357,6 +365,7 @@ export default function Home() {
           email: form.get("email"),
           city: form.get("city"),
           address: form.get("address"),
+          referralSource: selectedReferralSource,
         },
         items: cartItems.map((item) => ({
           productId: item.product.id,
@@ -376,6 +385,7 @@ export default function Home() {
         email: String(form.get("email") || ""),
         city: String(form.get("city") || ""),
         address: String(form.get("address") || ""),
+        referralSource: selectedReferralSource,
       }, cartItems, total);
 
       const whatsappUrl = buildWhatsappUrl(whatsappMessage);
@@ -397,6 +407,8 @@ export default function Home() {
           "Commande confirmée. Redirection vers WhatsApp pour finaliser avec le vendeur.",
       });
       setCart({});
+      setHasReferralSource(false);
+      setReferralSource(collaborators[0]);
       checkoutForm.reset();
       window.location.assign(whatsappUrl);
     }
@@ -869,6 +881,34 @@ export default function Home() {
             </div>
             <Input name="address" label={text.address} required />
 
+            <div className="rounded-md border border-black/10 bg-white p-4">
+              <label className="flex cursor-pointer items-start gap-3 text-sm font-bold text-black/75">
+                <input
+                  type="checkbox"
+                  checked={hasReferralSource}
+                  onChange={(event) => setHasReferralSource(event.target.checked)}
+                  className="mt-1 size-4 accent-black"
+                />
+                <span>{text.referralQuestion}</span>
+              </label>
+              {hasReferralSource ? (
+                <label className="mt-4 grid gap-2 text-sm font-bold">
+                  {text.referralSelect}
+                  <select
+                    value={referralSource}
+                    onChange={(event) => setReferralSource(event.target.value)}
+                    className="h-11 rounded-md border border-black/15 bg-white px-3 font-normal outline-none focus:border-[var(--theme-accent-dark)]"
+                  >
+                    {collaborators.map((collaborator) => (
+                      <option key={collaborator} value={collaborator}>
+                        {collaborator}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </div>
+
             <div className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-4">
               <p className="font-black">{text.contactOrder}</p>
               <p className="mt-2 text-sm leading-6 text-black/60">
@@ -937,6 +977,7 @@ function buildWhatsappMessage(
     email: string;
     city: string;
     address: string;
+    referralSource?: string;
   },
   cartItems: Array<{ product: Product; quantity: number }>,
   total: number,
@@ -954,6 +995,7 @@ function buildWhatsappMessage(
     `Email: ${customer.email}`,
     `Ville: ${customer.city}`,
     `Adresse: ${customer.address}`,
+    `Publicité: ${customer.referralSource || "Non"}`,
     "",
     "Produits:",
     products,
