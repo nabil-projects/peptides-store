@@ -47,7 +47,7 @@ const copy = {
     trust: [
       "Livraison suivie",
       "Contact WhatsApp",
-      "Pureté contrôlée",
+      "Pureté ≥ 99 %",
       "Expédition rapide",
       "Commande accompagnée",
       "Catalogue contrôlé",
@@ -57,7 +57,7 @@ const copy = {
       "Une boutique soignée avec un catalogue fluide, des prix visibles et une expérience simple pour passer de la sélection au panier.",
     viewShop: "Voir la boutique",
     whatsapp: "Contact WhatsApp",
-    technical: ["Pureté contrôlée", "Dosage de précision", "Traçabilité laboratoire"],
+    technical: ["Pureté ≥ 99 %", "Dosage de précision", "Traçabilité laboratoire"],
     shop: "Boutique",
     allProducts: "Tous les produits",
     loading: "Chargement du catalogue...",
@@ -492,14 +492,14 @@ export default function Home() {
 
       <div className="overflow-hidden bg-[var(--theme-ink)] py-2 text-white">
         <div className="trust-marquee flex w-max items-center">
-          {[0, 1].map((group) => (
+          {[0, 1, 2].map((group) => (
             <div
               key={group}
               className="flex shrink-0 items-center gap-8 px-4 text-xs font-black uppercase tracking-[0.16em] sm:gap-12"
-              aria-hidden={group === 1}
+              aria-hidden={group !== 0}
             >
-              {trustMessages.map(({ icon: Icon, label }) => (
-                <span key={`${group}-${label}`} className="inline-flex items-center gap-2 whitespace-nowrap">
+              {trustMessages.map(({ icon: Icon, label }, index) => (
+                <span key={`${group}-${index}-${label}`} className="inline-flex items-center gap-2 whitespace-nowrap">
                   <Icon size={15} className="text-[var(--theme-accent-soft)]" />
                   {label}
                 </span>

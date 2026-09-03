@@ -48,7 +48,10 @@ a[href]:hover {
 }
 
 .trust-marquee {
-  animation: trust-marquee 24s linear infinite;
+  animation: trust-marquee 36s linear infinite;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 @keyframes hero-zoom {
@@ -63,11 +66,11 @@ a[href]:hover {
 
 @keyframes trust-marquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-33.333333%, 0, 0);
   }
 }
 
