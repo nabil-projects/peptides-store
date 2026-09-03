@@ -940,7 +940,6 @@ export default function Home() {
                 <a href="#" className="w-fit hover:text-white">Home</a>
                 <a href="#boutique" className="w-fit hover:text-white">{text.navShop}</a>
                 <a href="#checkout" className="w-fit hover:text-white">Contact</a>
-                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions légales</a>
               </nav>
             </div>
 
