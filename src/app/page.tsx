@@ -5,7 +5,6 @@ import {
   ChevronDown,
   Languages,
   LogIn,
-  Mail,
   Minus,
   Plus,
   Search,
@@ -93,10 +92,6 @@ const copy = {
     contactWhatsapp: "Contacter sur WhatsApp",
     mainMenu: "Main Menu",
     footerMenu: "Footer Menu",
-    signup: "Sign Up And Save",
-    signupText:
-      "Recevez les nouveautés, les alertes catalogue et les offres disponibles directement par email.",
-    emailPlaceholder: "Enter your email",
     footerLine:
       "Copyright 2026 BIP HORIZON. Boutique spécialisée avec catalogue sélectionné, contact direct et accompagnement client.",
     stock: {
@@ -171,10 +166,6 @@ const copy = {
     contactWhatsapp: "Contact on WhatsApp",
     mainMenu: "Main Menu",
     footerMenu: "Footer Menu",
-    signup: "Sign Up And Save",
-    signupText:
-      "Receive new arrivals, catalogue alerts and available offers directly by email.",
-    emailPlaceholder: "Enter your email",
     footerLine:
       "Copyright 2026 BIP HORIZON. Specialist store with curated catalogue, direct contact and customer support.",
     stock: {
@@ -900,7 +891,7 @@ export default function Home() {
 
       <footer id="legal" className="bg-[#050505] text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <div className="grid gap-10 md:grid-cols-[1fr_1fr_1.35fr]">
+          <div className="grid gap-10 md:grid-cols-2">
             <div>
               <h2 className="text-sm font-black uppercase tracking-[0.18em]">
                 {text.mainMenu}
@@ -924,23 +915,6 @@ export default function Home() {
                 <a href="/politique-confidentialite" className="w-fit hover:text-white">Politique de confidentialité</a>
                 <a href="/mentions-legales" className="w-fit hover:text-white">Mentions légales</a>
               </nav>
-            </div>
-
-            <div>
-              <h2 className="text-sm font-black uppercase tracking-[0.18em]">
-                {text.signup}
-              </h2>
-              <p className="mt-6 max-w-sm text-sm leading-6 text-white/68">
-                {text.signupText}
-              </p>
-              <label className="mt-5 flex h-12 max-w-sm items-center rounded-md border border-white/85 px-4">
-                <input
-                  type="email"
-                  placeholder={text.emailPlaceholder}
-                  className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/58"
-                />
-                <Mail size={21} className="text-white/70" />
-              </label>
             </div>
           </div>
 
