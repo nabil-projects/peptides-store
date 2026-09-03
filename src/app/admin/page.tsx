@@ -293,28 +293,19 @@ export default function AdminPage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const payload = new FormData();
-    payload.append("file", file);
     setIsUploading(true);
     setStatus("");
 
-    const response = await fetch("/api/uploads", {
-      method: "POST",
-      body: payload,
-    });
-    const result = await response.json();
-    setIsUploading(false);
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        setIsAuthenticated(false);
-      }
-      setStatus(result.message || "Upload impossible.");
-      return;
+    try {
+      const image = await fileToCompressedDataUrl(file);
+      updateField("image", image);
+      setStatus("Photo ajoutee. Pense a enregistrer le produit.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Upload impossible.");
+    } finally {
+      setIsUploading(false);
+      event.target.value = "";
     }
-
-    updateField("image", result.url);
-    setStatus("Photo ajoutee. Pense a enregistrer le produit.");
   }
 
   async function uploadGuideVideo(event: ChangeEvent<HTMLInputElement>) {
@@ -708,11 +699,29 @@ export default function AdminPage() {
                 className="aspect-square w-full rounded-md border border-black/10 object-cover"
               />
               <div className="grid min-w-0 content-start gap-3">
-                <Input
-                  label="URL photo"
-                  value={form.image || ""}
-                  onChange={(value) => updateField("image", value)}
-                />
+                {form.image?.startsWith("data:image/") ? (
+                  <div className="grid gap-2 text-sm font-bold">
+                    Photo
+                    <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 rounded-md border border-black/15 px-3 py-2 font-normal">
+                      <span className="text-xs font-semibold text-black/55">
+                        Photo importee et enregistree avec le produit
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateField("image", "/catalog-hero.png")}
+                        className="rounded-md border border-black/15 px-3 py-1.5 text-xs font-black transition hover:bg-black hover:text-white"
+                      >
+                        Retirer
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <Input
+                    label="URL photo"
+                    value={form.image || ""}
+                    onChange={(value) => updateField("image", value)}
+                  />
+                )}
                 <label className="inline-flex h-11 w-fit cursor-pointer items-center gap-2 rounded-md border border-black/15 px-4 text-sm font-black">
                   <input type="file" accept="image/*" onChange={uploadImage} className="sr-only" />
                   {isUploading ? <Upload size={18} /> : <ImagePlus size={18} />}
@@ -728,6 +737,47 @@ export default function AdminPage() {
       )}
     </main>
   );
+}
+
+async function fileToCompressedDataUrl(file: File) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Fichier image requis.");
+  }
+
+  const image = await loadImage(file);
+  const maxSize = 1100;
+  const ratio = Math.min(1, maxSize / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * ratio));
+  const height = Math.max(1, Math.round(image.height * ratio));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error("Compression image impossible.");
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  context.drawImage(image, 0, 0, width, height);
+
+  return canvas.toDataURL("image/jpeg", 0.82);
+}
+
+function loadImage(file: File) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Image invalide."));
+    };
+    image.src = url;
+  });
 }
 
 function GuidesPanel({
