@@ -192,6 +192,7 @@ export default function Home() {
     orderId?: string;
     message: string;
   } | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   const [status, setStatus] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -317,6 +318,11 @@ export default function Home() {
 
   function updateCart(productId: string, quantity: number) {
     setCart((current) => ({ ...current, [productId]: Math.max(0, quantity) }));
+  }
+
+  function scrollToCheckout() {
+    setIsCartOpen(false);
+    document.getElementById("checkout")?.scrollIntoView({ behavior: "smooth" });
   }
 
   function confirmAccess() {
@@ -482,6 +488,126 @@ export default function Home() {
         </div>
       ) : null}
 
+      {isCartOpen ? (
+        <div
+          className="fixed inset-0 z-50 bg-black/35 px-4 py-5 backdrop-blur-sm"
+          onClick={() => setIsCartOpen(false)}
+        >
+          <div
+            className="ml-auto flex max-h-[calc(100vh-2.5rem)] w-full max-w-md flex-col rounded-md border border-black/10 bg-white text-black shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/10 p-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
+                  {text.cart}
+                </p>
+                <h2 className="text-xl font-black">{cartItems.length} produit{cartItems.length > 1 ? "s" : ""}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(false)}
+                className="grid size-9 place-items-center rounded-md border border-black/15 text-sm font-black"
+                aria-label="Fermer"
+              >
+                x
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              {cartItems.length ? (
+                <div className="grid gap-3">
+                  {cartItems.map((item) => (
+                    <article
+                      key={item.product.id}
+                      className="grid grid-cols-[64px_1fr] gap-3 rounded-md border border-black/10 p-3"
+                    >
+                      <img
+                        src={item.product.image || "/catalog-hero.png"}
+                        alt={item.product.name}
+                        className="aspect-square w-16 rounded-md object-cover"
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate font-black">{item.product.name}</p>
+                            <p className="mt-1 text-sm text-black/55">
+                              {item.product.price ? formatPrice(item.product.price) : text.priceOnRequest}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            aria-label={language === "fr" ? "Supprimer" : "Remove"}
+                            onClick={() => updateCart(item.product.id, 0)}
+                            className="grid size-8 shrink-0 place-items-center rounded-md border border-black/15 text-red-700"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                        <div className="mt-3 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              aria-label={language === "fr" ? "Diminuer" : "Decrease"}
+                              onClick={() => updateCart(item.product.id, item.quantity - 1)}
+                              className="grid size-8 place-items-center rounded-md border border-black/15"
+                            >
+                              <Minus size={15} />
+                            </button>
+                            <span className="w-7 text-center font-bold">{item.quantity}</span>
+                            <button
+                              type="button"
+                              aria-label={language === "fr" ? "Augmenter" : "Increase"}
+                              onClick={() => updateCart(item.product.id, item.quantity + 1)}
+                              className="grid size-8 place-items-center rounded-md border border-black/15"
+                            >
+                              <Plus size={15} />
+                            </button>
+                          </div>
+                          <p className="text-sm font-black">
+                            {formatPrice(item.product.price * item.quantity)}
+                          </p>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="rounded-md border border-dashed border-black/15 p-5 text-sm font-semibold text-black/55">
+                  {text.emptyCart}
+                </p>
+              )}
+            </div>
+
+            <div className="border-t border-black/10 p-4">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>{text.subtotal}</span>
+                  <strong>{formatPrice(subtotal)}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>{text.shipping}</span>
+                  <strong>{shipping ? formatPrice(shipping) : text.free}</strong>
+                </div>
+                <div className="flex justify-between text-xl font-black">
+                  <span>Total</span>
+                  <span>{formatPrice(total)}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={scrollToCheckout}
+                disabled={!cartItems.length}
+                className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-black px-5 text-sm font-black text-white transition hover:bg-neutral-800 disabled:opacity-40"
+              >
+                <ShoppingBag size={18} />
+                {text.contactWhatsapp}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="border-b border-yellow-500 bg-yellow-300 px-4 py-2 text-center text-xs font-black uppercase tracking-[0.14em] text-black sm:text-sm">
         {text.alert}
       </div>
@@ -521,21 +647,22 @@ export default function Home() {
             <a href="#boutique" className="hover:text-black">
               {text.navShop}
             </a>
-            <a href="#checkout" className="hover:text-black">
+            <button type="button" onClick={() => setIsCartOpen(true)} className="hover:text-black">
               {text.navCart}
-            </a>
+            </button>
             <a href="/conditions-generales-vente" className="hover:text-black">
               {text.navTerms}
             </a>
           </nav>
           <div className="flex items-center gap-2">
-            <a
-              href="#checkout"
+            <button
+              type="button"
+              onClick={() => setIsCartOpen(true)}
               className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
             >
               <ShoppingBag size={18} />
               {cartItems.length}
-            </a>
+            </button>
             <button
               type="button"
               onClick={toggleLanguage}
