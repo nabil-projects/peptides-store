@@ -2,7 +2,7 @@
 import nodemailer from "nodemailer";
 import type { Product } from "@/data/products";
 import { createOrderRecord } from "@/lib/order-store";
-import { getProducts } from "@/lib/product-store";
+import { decrementProductStocks, getProducts } from "@/lib/product-store";
 import { formatPrice } from "@/lib/money";
 
 type OrderItem = {
@@ -122,6 +122,7 @@ export async function POST(request: Request) {
   }
 
   const storedOrder = await createOrderRecord(order, products);
+  await decrementProductStocks(order.items);
   await sendOrderEmail(order, products);
 
   return NextResponse.json({

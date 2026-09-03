@@ -7,6 +7,7 @@
   unit: string;
   rating?: number;
   stock: "in-stock" | "preorder" | "notify";
+  stockQuantity?: number;
   description: string;
   image?: string;
   badge?: string;

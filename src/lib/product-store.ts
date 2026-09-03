@@ -21,6 +21,7 @@ type ProductRow = {
   unit: string;
   rating: number | null;
   stock: Product["stock"];
+  stock_quantity: number | null;
   description: string;
   image: string | null;
   badge: string | null;
@@ -138,6 +139,52 @@ export async function deleteProduct(id: string) {
   return true;
 }
 
+export async function decrementProductStocks(items: Array<{ productId: string; quantity: number }>) {
+  if (!items.length) return;
+
+  const products = await getProducts();
+  const nextProducts = products.map((product) => {
+    const orderedQuantity = items
+      .filter((item) => item.productId === product.id)
+      .reduce((sum, item) => sum + Math.max(1, Number(item.quantity) || 1), 0);
+
+    if (!orderedQuantity) {
+      return product;
+    }
+
+    const currentQuantity = Math.max(0, Number(product.stockQuantity) || 0);
+    const stockQuantity = Math.max(0, currentQuantity - orderedQuantity);
+
+    return {
+      ...product,
+      stockQuantity,
+      stock: stockQuantity > 0 ? product.stock : "notify",
+    } satisfies Product;
+  });
+
+  if (isSupabaseConfigured()) {
+    await Promise.all(
+      nextProducts
+        .filter((product, index) => product !== products[index])
+        .map((product) =>
+          supabaseRequest("products", {
+            method: "PATCH",
+            query: { id: `eq.${product.id}` },
+            prefer: "return=minimal",
+            body: {
+              stock: product.stock,
+              stock_quantity: product.stockQuantity ?? 0,
+              updated_at: new Date().toISOString(),
+            },
+          }),
+        ),
+    );
+    return;
+  }
+
+  await saveLocalProducts(nextProducts);
+}
+
 async function seedDefaultProducts() {
   await supabaseRequest("products", {
     method: "POST",
@@ -172,6 +219,7 @@ function toProductRow(product: Product) {
     unit: product.unit,
     rating: product.rating ?? null,
     stock: product.stock,
+    stock_quantity: product.stockQuantity ?? 0,
     description: product.description,
     image: product.image || "/catalog-hero.png",
     badge: product.badge ?? null,
@@ -190,6 +238,7 @@ function fromProductRow(row?: ProductRow) {
     unit: row.unit,
     rating: row.rating ?? undefined,
     stock: row.stock,
+    stockQuantity: row.stock_quantity ?? 0,
     description: row.description,
     image: row.image || "/catalog-hero.png",
     badge: row.badge ?? undefined,
@@ -220,6 +269,7 @@ function normalizeProduct(input: ProductInput) {
     unit,
     rating: input.rating === undefined ? undefined : toOptionalNumber(input.rating),
     stock,
+    stockQuantity: Math.round(toNumber(input.stockQuantity, 0)),
     description,
     image: String(input.image || "/catalog-hero.png").trim(),
     badge: String(input.badge || "").trim() || undefined,

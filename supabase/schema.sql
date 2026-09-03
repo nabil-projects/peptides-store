@@ -14,6 +14,7 @@ create table if not exists public.products (
   unit text not null,
   rating numeric check (rating is null or rating >= 0),
   stock text not null default 'in-stock' check (stock in ('in-stock', 'preorder', 'notify')),
+  stock_quantity integer not null default 0 check (stock_quantity >= 0),
   description text not null,
   image text,
   badge text,
@@ -60,6 +61,10 @@ begin
     execute format('alter table public.products drop constraint %I', constraint_name);
   end if;
 end $$;
+
+alter table public.products
+add column if not exists stock_quantity integer not null default 0
+check (stock_quantity >= 0);
 
 insert into public.product_categories (id, name)
 values

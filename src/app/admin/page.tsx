@@ -83,6 +83,7 @@ const emptyForm: FormState = {
   unit: "",
   rating: "",
   stock: "in-stock",
+  stockQuantity: 0,
   description: "",
   image: "/catalog-hero.png",
   badge: "",
@@ -451,11 +452,11 @@ export default function AdminPage() {
     setStatus("Produit supprimé.");
   }
 
-  async function changeProductStock(product: Product, stock: Product["stock"]) {
+  async function updateProductStock(product: Product, updates: Pick<Product, "stock"> & Partial<Pick<Product, "stockQuantity">>) {
     const response = await fetch(`/api/products/${product.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...product, stock }),
+      body: JSON.stringify({ ...product, ...updates }),
     });
     const result = await response.json();
 
@@ -696,7 +697,7 @@ export default function AdminPage() {
           onRefresh={loadOrders}
         />
       ) : activeTab === "stock" ? (
-        <StockPanel products={products} onStockChange={changeProductStock} />
+        <StockPanel products={products} onStockUpdate={updateProductStock} />
       ) : activeTab === "categories" ? (
         <CategoriesPanel
           categories={categories}
@@ -954,19 +955,32 @@ function loadImage(file: File) {
 
 function StockPanel({
   products,
-  onStockChange,
+  onStockUpdate,
 }: {
   products: Product[];
-  onStockChange: (product: Product, stock: Product["stock"]) => void;
+  onStockUpdate: (
+    product: Product,
+    updates: Pick<Product, "stock"> & Partial<Pick<Product, "stockQuantity">>,
+  ) => void;
 }) {
   const counts = stockOptions.map((option) => ({
     ...option,
     count: products.filter((product) => product.stock === option.value).length,
   }));
+  const totalQuantity = products.reduce(
+    (sum, product) => sum + Math.max(0, Number(product.stockQuantity) || 0),
+    0,
+  );
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div className="mb-5 grid gap-3 sm:grid-cols-3">
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-md border border-black/10 bg-white p-4">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
+            Quantité totale
+          </p>
+          <p className="mt-2 text-3xl font-black">{totalQuantity}</p>
+        </div>
         {counts.map((item) => (
           <div key={item.value} className="rounded-md border border-black/10 bg-white p-4">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
@@ -988,7 +1002,7 @@ function StockPanel({
           {products.map((product) => (
             <article
               key={product.id}
-              className="grid gap-4 p-4 md:grid-cols-[82px_1fr_240px]"
+              className="grid gap-4 p-4 md:grid-cols-[82px_1fr_180px_240px]"
             >
               <img
                 src={product.image || "/catalog-hero.png"}
@@ -1004,11 +1018,27 @@ function StockPanel({
                   {formatPrice(product.price)} · {product.unit}
                 </p>
               </div>
+              <Input
+                label="Quantité"
+                type="number"
+                value={product.stockQuantity ?? 0}
+                onChange={(value) =>
+                  onStockUpdate(product, {
+                    stock: product.stock,
+                    stockQuantity: Math.max(0, Math.round(Number(value) || 0)),
+                  })
+                }
+              />
               <Select
                 label="État du stock"
                 value={product.stock}
                 options={stockOptions}
-                onChange={(value) => onStockChange(product, value as Product["stock"])}
+                onChange={(value) =>
+                  onStockUpdate(product, {
+                    stock: value as Product["stock"],
+                    stockQuantity: product.stockQuantity ?? 0,
+                  })
+                }
               />
             </article>
           ))}
