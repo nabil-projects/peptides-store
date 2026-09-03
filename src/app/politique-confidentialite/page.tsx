@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { LegalPage } from "@/app/legal-page";
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialite - BIP HORIZON",
+  title: "Politique de confidentialité - BIP HORIZON",
 };
 
 export default function PolitiqueConfidentialitePage() {
   return (
     <LegalPage
-      title="Politique de confidentialite"
+      title="Politique de confidentialité"
       filename="politique-confidentialite.txt"
     />
   );

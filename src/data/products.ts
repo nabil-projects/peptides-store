@@ -1,4 +1,4 @@
-export type Product = {
+﻿export type Product = {
   id: string;
   name: string;
   category: "Peptides" | "Accessoires" | "Packs" | "Nutrition";
@@ -22,7 +22,7 @@ export const defaultProducts: Product[] = [
     unit: "10 mg",
     rating: 4.7,
     stock: "in-stock",
-    description: "Produit destine a la recherche in vitro, controle par lot.",
+    description: "Produit destiné à la recherche in vitro, contrôlé par lot.",
     image: "/catalog-hero.png",
     badge: "HPLC",
   },
@@ -35,7 +35,7 @@ export const defaultProducts: Product[] = [
     unit: "50 mg",
     rating: 4.9,
     stock: "in-stock",
-    description: "Reference laboratoire, disponibilite confirmee au checkout.",
+    description: "Référence laboratoire, disponibilité confirmée au checkout.",
     image: "/catalog-hero.png",
   },
   {
@@ -47,7 +47,7 @@ export const defaultProducts: Product[] = [
     unit: "5 mg",
     rating: 4.8,
     stock: "in-stock",
-    description: "Usage strictement recherche. Aucune promesse medicale.",
+    description: "Usage strictement recherche. Aucune promesse médicale.",
     image: "/catalog-hero.png",
   },
   {
@@ -71,7 +71,7 @@ export const defaultProducts: Product[] = [
     unit: "pack",
     rating: 4.8,
     stock: "in-stock",
-    description: "Pack de references selectionnees pour commande groupee.",
+    description: "Pack de références sélectionnées pour commande groupée.",
     image: "/catalog-hero.png",
     badge: "Pack",
   },
@@ -96,7 +96,7 @@ export const defaultProducts: Product[] = [
     unit: "10 ml",
     rating: 4.7,
     stock: "in-stock",
-    description: "Accessoire laboratoire, vendu selon disponibilite.",
+    description: "Accessoire laboratoire, vendu selon disponibilité.",
     image: "/catalog-hero.png",
   },
   {

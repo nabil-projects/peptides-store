@@ -1,14 +1,14 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { LegalPage } from "@/app/legal-page";
 
 export const metadata: Metadata = {
-  title: "Conditions generales de vente - BIP HORIZON",
+  title: "Conditions générales de vente - BIP HORIZON",
 };
 
 export default function ConditionsGeneralesVentePage() {
   return (
     <LegalPage
-      title="Conditions generales de vente"
+      title="Conditions générales de vente"
       filename="conditions-generales-vente.txt"
     />
   );

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { deleteOrder, updateOrderStatus, type OrderStatus } from "@/lib/order-store";
 
@@ -42,5 +42,5 @@ export async function DELETE(_request: Request, context: Context) {
     return NextResponse.json({ message: "Commande introuvable." }, { status: 404 });
   }
 
-  return NextResponse.json({ message: "Commande supprimee." });
+  return NextResponse.json({ message: "Commande supprimée." });
 }

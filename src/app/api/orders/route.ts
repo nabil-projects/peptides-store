@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import type { Product } from "@/data/products";
 import { createOrderRecord } from "@/lib/order-store";
@@ -62,10 +62,10 @@ function buildOrderText(order: OrderRequest, products: Product[]) {
     `Total produits: ${formatPrice(total)}`,
     "",
     `Nom: ${order.customer.name}`,
-    `Telephone: ${order.customer.phone}`,
-    `Email: ${order.customer.email || "non renseigne"}`,
-    `Ville: ${order.customer.city || "non renseignee"}`,
-    `Adresse: ${order.customer.address || "non renseignee"}`,
+    `Téléphone: ${order.customer.phone}`,
+    `Email: ${order.customer.email || "non renseigné"}`,
+    `Ville: ${order.customer.city || "non renseignée"}`,
+    `Adresse: ${order.customer.address || "non renseignée"}`,
     "",
     "Produits:",
     ...lines,
@@ -126,7 +126,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     message:
-      "Commande enregistree. WhatsApp va s'ouvrir pour finaliser avec le vendeur.",
+      "Commande enregistrée. WhatsApp va s'ouvrir pour finaliser avec le vendeur.",
     orderId: storedOrder.id,
   });
 }

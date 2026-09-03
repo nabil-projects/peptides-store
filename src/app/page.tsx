@@ -28,16 +28,16 @@ const whatsappPhone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || "";
 
 const copy = {
   fr: {
-    accessTitle: "Acces Professionnel",
+    accessTitle: "Accès Professionnel",
     accessText:
-      "BIP HORIZON fournit des composes exclusivement pour la recherche en laboratoire. L'acces est reserve aux professionnels qualifies.",
+      "BIP HORIZON fournit des composés exclusivement pour la recherche en laboratoire. L'accès est réservé aux professionnels qualifiés.",
     accessConfirm:
-      "Je confirme etre un professionnel qualifie et que cette commande est uniquement destinee a la recherche en laboratoire.",
-    accessButton: "Acceder au site",
+      "Je confirme être un professionnel qualifié et que cette commande est uniquement destinée à la recherche en laboratoire.",
+    accessButton: "Accéder au site",
     accessLegal:
-      "En entrant, vous confirmez etre en conformite avec toutes les lois applicables dans votre juridiction.",
+      "En entrant, vous confirmez être en conformité avec toutes les lois applicables dans votre juridiction.",
     alert:
-      "Attention: ce site est reserve uniquement aux laboratoires et a la recherche.",
+      "Attention: ce site est réservé uniquement aux laboratoires et à la recherche.",
     navShop: "Boutique",
     navCart: "Panier",
     navTerms: "Conditions",
@@ -47,32 +47,32 @@ const copy = {
     trust: [
       "Livraison suivie",
       "Contact WhatsApp",
-      "Purete controlee",
-      "Expedition rapide",
-      "Commande accompagnee",
-      "Catalogue controle",
+      "Pureté contrôlée",
+      "Expédition rapide",
+      "Commande accompagnée",
+      "Catalogue contrôlé",
     ],
-    heroTitle: "Excellence, performance et selection professionnelle.",
+    heroTitle: "Excellence, performance et sélection professionnelle.",
     heroText:
-      "Une boutique soignee avec un catalogue fluide, des prix visibles et une experience simple pour passer de la selection au panier.",
+      "Une boutique soignée avec un catalogue fluide, des prix visibles et une expérience simple pour passer de la sélection au panier.",
     viewShop: "Voir la boutique",
     whatsapp: "Contact WhatsApp",
-    technical: ["Purete controlee", "Dosage de precision", "Tracabilite laboratoire"],
+    technical: ["Pureté contrôlée", "Dosage de précision", "Traçabilité laboratoire"],
     shop: "Boutique",
     allProducts: "Tous les produits",
     loading: "Chargement du catalogue...",
     searchPlaceholder: "Rechercher un produit",
-    defaultSort: "Tri par defaut",
+    defaultSort: "Tri par défaut",
     priceAsc: "Prix croissant",
-    priceDesc: "Prix decroissant",
-    categories: "Categories",
+    priceDesc: "Prix décroissant",
+    categories: "Catégories",
     neutralNote:
-      "Les fiches doivent rester neutres : pas de promesse medicale, pas de conseil utilisation clinique.",
+      "Les fiches doivent rester neutres : pas de promesse médicale, pas de conseil utilisation clinique.",
     quote: "Devis",
-    notRated: "Non note",
+    notRated: "Non noté",
     addToCart: "Ajouter au panier",
     productCount: "produits",
-    previous: "Precedent",
+    previous: "Précédent",
     next: "Suivant",
     cart: "Panier",
     priceOnRequest: "Prix sur demande",
@@ -82,26 +82,26 @@ const copy = {
     free: "Offerte",
     customerInfo: "Informations client",
     name: "Nom complet",
-    phone: "Telephone",
+    phone: "Téléphone",
     email: "Email",
     city: "Ville",
     address: "Adresse de livraison",
     contactOrder: "Commande par contact WhatsApp",
     contactText:
-      "Apres validation, la commande est enregistree et WhatsApp s'ouvre avec le resume pret a envoyer au vendeur. Le paiement se confirme ensuite directement avec lui.",
-    sending: "Preparation...",
+      "Après validation, la commande est enregistrée et WhatsApp s'ouvre avec le résumé prêt à envoyer au vendeur. Le paiement se confirme ensuite directement avec lui.",
+    sending: "Préparation...",
     contactWhatsapp: "Contacter sur WhatsApp",
     mainMenu: "Main Menu",
     footerMenu: "Footer Menu",
     signup: "Sign Up And Save",
     signupText:
-      "Recevez les nouveautes, les alertes catalogue et les offres disponibles directement par email.",
+      "Recevez les nouveautés, les alertes catalogue et les offres disponibles directement par email.",
     emailPlaceholder: "Enter your email",
     footerLine:
-      "Copyright 2026 BIP HORIZON. Boutique specialisee avec catalogue selectionne, contact direct et accompagnement client.",
+      "Copyright 2026 BIP HORIZON. Boutique spécialisée avec catalogue sélectionné, contact direct et accompagnement client.",
     stock: {
       "in-stock": "En stock",
-      preorder: "Precommande",
+      preorder: "Précommande",
       notify: "Sur demande",
     },
   },
@@ -382,7 +382,7 @@ export default function Home() {
         setOrderNotice({
           orderId: result.orderId,
           message:
-            "Commande enregistree, mais le numero WhatsApp vendeur n'est pas configure.",
+            "Commande enregistrée, mais le numéro WhatsApp vendeur n'est pas configuré.",
         });
         setStatus("Ajoute NEXT_PUBLIC_WHATSAPP_PHONE dans .env.local puis relance le projet.");
         return;
@@ -392,7 +392,7 @@ export default function Home() {
         orderId: result.orderId,
         message:
           result.message ||
-          "Commande confirmee. Redirection vers WhatsApp pour finaliser avec le vendeur.",
+          "Commande confirmée. Redirection vers WhatsApp pour finaliser avec le vendeur.",
       });
       setCart({});
       checkoutForm.reset();
@@ -452,7 +452,7 @@ export default function Home() {
           <div className="flex items-start gap-3">
             <BadgeCheck className="mt-0.5 shrink-0 text-black" size={22} />
             <div className="min-w-0 flex-1">
-              <p className="font-black">Commande bien passee</p>
+              <p className="font-black">Commande bien passée</p>
               <p className="mt-1 text-sm leading-6 text-black/65">{orderNotice.message}</p>
               {orderNotice.orderId ? (
                 <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-black/45">
@@ -898,7 +898,7 @@ export default function Home() {
                 <a href="#" className="w-fit hover:text-white">Home</a>
                 <a href="#boutique" className="w-fit hover:text-white">{text.navShop}</a>
                 <a href="#checkout" className="w-fit hover:text-white">Contact</a>
-                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions legales</a>
+                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions légales</a>
               </nav>
             </div>
 
@@ -909,9 +909,9 @@ export default function Home() {
               <nav className="mt-6 grid gap-4 text-sm text-white/68">
                 <a href="#boutique" className="w-fit hover:text-white">Search</a>
                 <a href="#" className="w-fit hover:text-white">About Us</a>
-                <a href="/conditions-generales-vente" className="w-fit hover:text-white">Conditions generales de vente</a>
-                <a href="/politique-confidentialite" className="w-fit hover:text-white">Politique de confidentialite</a>
-                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions legales</a>
+                <a href="/conditions-generales-vente" className="w-fit hover:text-white">Conditions générales de vente</a>
+                <a href="/politique-confidentialite" className="w-fit hover:text-white">Politique de confidentialité</a>
+                <a href="/mentions-legales" className="w-fit hover:text-white">Mentions légales</a>
               </nav>
             </div>
 
@@ -965,7 +965,7 @@ function buildWhatsappMessage(
     orderId ? `Reference: ${orderId}` : "",
     "",
     `Nom: ${customer.name}`,
-    `Telephone: ${customer.phone}`,
+    `Téléphone: ${customer.phone}`,
     `Email: ${customer.email}`,
     `Ville: ${customer.city}`,
     `Adresse: ${customer.address}`,

@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { LegalPage } from "@/app/legal-page";
 
 export const metadata: Metadata = {
-  title: "Mentions legales - BIP HORIZON",
+  title: "Mentions légales - BIP HORIZON",
 };
 
 export default function MentionsLegalesPage() {
-  return <LegalPage title="Mentions legales" filename="mentions-legales.txt" />;
+  return <LegalPage title="Mentions légales" filename="mentions-legales.txt" />;
 }

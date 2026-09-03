@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   ArrowLeft,
@@ -87,14 +87,14 @@ const emptyGuideForm: GuideFormState = {
 const editableCategories = categories.filter((category) => category !== "Tous");
 const stockOptions = [
   { value: "in-stock", label: "En stock" },
-  { value: "preorder", label: "Precommande" },
+  { value: "preorder", label: "Précommande" },
   { value: "notify", label: "Sur demande" },
 ] as const;
 
 const orderStatuses: Array<{ value: OrderStatus; label: string }> = [
   { value: "pending_payment", label: "Paiement en attente" },
-  { value: "paid", label: "Payee" },
-  { value: "cancelled", label: "Annulee" },
+  { value: "paid", label: "Payée" },
+  { value: "cancelled", label: "Annulée" },
 ];
 
 const statusLabels = Object.fromEntries(
@@ -225,7 +225,7 @@ export default function AdminPage() {
     }
 
     await loadOrders();
-    setStatus("Statut de commande modifie.");
+    setStatus("Statut de commande modifié.");
   }
 
   async function removeOrder(order: StoredOrder) {
@@ -246,7 +246,7 @@ export default function AdminPage() {
     }
 
     await loadOrders();
-    setStatus("Commande supprimee.");
+    setStatus("Commande supprimée.");
   }
 
   function editProduct(product: Product) {
@@ -299,7 +299,7 @@ export default function AdminPage() {
     try {
       const image = await fileToCompressedDataUrl(file);
       updateField("image", image);
-      setStatus("Photo ajoutee. Pense a enregistrer le produit.");
+      setStatus("Photo ajoutée. Pense à enregistrer le produit.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Upload impossible.");
     } finally {
@@ -328,12 +328,12 @@ export default function AdminPage() {
       if (response.status === 401) {
         setIsAuthenticated(false);
       }
-      setStatus(result.message || "Upload video impossible.");
+      setStatus(result.message || "Upload vidéo impossible.");
       return;
     }
 
     updateGuideField("videoUrl", result.url);
-    setStatus("Video ajoutee. Pense a enregistrer le guide.");
+    setStatus("Vidéo ajoutée. Pense à enregistrer le guide.");
   }
 
   async function saveProduct(event: FormEvent<HTMLFormElement>) {
@@ -366,7 +366,7 @@ export default function AdminPage() {
     }
 
     await loadProducts();
-    setStatus(selectedId ? "Produit modifie." : "Produit ajoute.");
+    setStatus(selectedId ? "Produit modifié." : "Produit ajouté.");
     if (!selectedId) {
       resetForm();
     }
@@ -395,7 +395,7 @@ export default function AdminPage() {
     }
 
     await loadGuides();
-    setStatus(selectedGuideId ? "Guide modifie." : "Guide ajoute.");
+    setStatus(selectedGuideId ? "Guide modifié." : "Guide ajouté.");
     if (!selectedGuideId) {
       resetGuideForm();
     }
@@ -420,7 +420,7 @@ export default function AdminPage() {
     if (selectedId === product.id) {
       resetForm();
     }
-    setStatus("Produit supprime.");
+    setStatus("Produit supprimé.");
   }
 
   async function removeGuide(guide: GuideVideo) {
@@ -442,7 +442,7 @@ export default function AdminPage() {
     if (selectedGuideId === guide.id) {
       resetGuideForm();
     }
-    setStatus("Guide supprime.");
+    setStatus("Guide supprimé.");
   }
 
   if (!isAuthenticated) {
@@ -473,11 +473,11 @@ export default function AdminPage() {
             className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-black text-white disabled:opacity-60"
           >
             <Save size={18} />
-            {isCheckingSession ? "Verification..." : "Entrer"}
+            {isCheckingSession ? "Vérification..." : "Entrer"}
           </button>
           {status ? <p className="mt-3 text-sm font-bold text-red-700">{status}</p> : null}
           <p className="mt-4 text-xs leading-5 text-black/45">
-            En local, le mot de passe par defaut est admin123 si ADMIN_PASSWORD n'est pas configure.
+            En local, le mot de passe par défaut est admin123 si ADMIN_PASSWORD n'est pas configuré.
           </p>
         </form>
       </main>
@@ -547,7 +547,7 @@ export default function AdminPage() {
                 Produits
               </p>
               <h2 className="text-xl font-black">
-                {filteredProducts.length} / {products.length} references
+                {filteredProducts.length} / {products.length} références
               </h2>
             </div>
             <BadgeEuro className="text-[var(--theme-accent-dark)]" size={26} />
@@ -561,7 +561,7 @@ export default function AdminPage() {
             <input
               value={productSearch}
               onChange={(event) => setProductSearch(event.target.value)}
-              placeholder="Rechercher par nom, categorie, unite..."
+              placeholder="Rechercher par nom, catégorie, unité..."
               className="h-11 w-full rounded-md border border-black/15 bg-white pl-10 pr-3 text-sm font-semibold outline-none transition focus:border-[var(--theme-accent-dark)]"
               aria-label="Rechercher un produit"
             />
@@ -610,7 +610,7 @@ export default function AdminPage() {
               </article>
             )) : (
               <p className="rounded-md border border-dashed border-black/15 p-4 text-sm font-semibold text-black/55">
-                Aucun produit trouve.
+                Aucun produit trouvé.
               </p>
             )}
           </div>
@@ -620,7 +620,7 @@ export default function AdminPage() {
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-[var(--theme-accent-dark)]">
-                Edition
+                Édition
               </p>
               <h2 className="text-xl font-black">
                 {selectedProduct ? `Modifier ${selectedProduct.name}` : "Ajouter un produit"}
@@ -639,7 +639,7 @@ export default function AdminPage() {
           <div className="grid min-w-0 gap-5">
             <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <Input label="Nom" value={form.name} onChange={(value) => updateField("name", value)} required />
-              <Input label="Unite" value={form.unit} onChange={(value) => updateField("unit", value)} required />
+              <Input label="Unité" value={form.unit} onChange={(value) => updateField("unit", value)} required />
             </div>
 
             <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
@@ -667,7 +667,7 @@ export default function AdminPage() {
 
             <div className="grid min-w-0 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)]">
               <Select
-                label="Categorie"
+                label="Catégorie"
                 value={form.category}
                 options={editableCategories.map((category) => ({ value: category, label: category }))}
                 onChange={(value) => updateField("category", value as Product["category"])}
@@ -695,7 +695,7 @@ export default function AdminPage() {
             <div className="grid min-w-0 gap-4 sm:grid-cols-[150px_minmax(0,1fr)]">
               <img
                 src={form.image || "/catalog-hero.png"}
-                alt="Apercu produit"
+                alt="Aperçu produit"
                 className="aspect-square w-full rounded-md border border-black/10 object-cover"
               />
               <div className="grid min-w-0 content-start gap-3">
@@ -704,7 +704,7 @@ export default function AdminPage() {
                     Photo
                     <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 rounded-md border border-black/15 px-3 py-2 font-normal">
                       <span className="text-xs font-semibold text-black/55">
-                        Photo importee et enregistree avec le produit
+                        Photo importée et enregistrée avec le produit
                       </span>
                       <button
                         type="button"
@@ -817,7 +817,7 @@ function GuidesPanel({
             <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
               Guide
             </p>
-            <h2 className="text-xl font-black">{guides.length} videos</h2>
+            <h2 className="text-xl font-black">{guides.length} vidéos</h2>
           </div>
           <PlayCircle size={26} />
         </div>
@@ -869,7 +869,7 @@ function GuidesPanel({
             ))
           ) : (
             <p className="rounded-md border border-black/10 bg-[var(--theme-mist)] p-5 text-sm font-semibold text-black/55">
-              Aucune video guide pour le moment.
+              Aucune vidéo guide pour le moment.
             </p>
           )}
         </div>
@@ -879,10 +879,10 @@ function GuidesPanel({
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-black/45">
-              Edition
+              Édition
             </p>
             <h2 className="text-xl font-black">
-              {selectedGuide ? `Modifier ${selectedGuide.title}` : "Ajouter une video guide"}
+              {selectedGuide ? `Modifier ${selectedGuide.title}` : "Ajouter une vidéo guide"}
             </h2>
           </div>
           <button
@@ -903,7 +903,7 @@ function GuidesPanel({
             required
           />
           <Input
-            label="URL video"
+            label="URL vidéo"
             value={form.videoUrl}
             onChange={(value) => onChange("videoUrl", value)}
             required
@@ -917,13 +917,13 @@ function GuidesPanel({
             />
           ) : (
             <div className="grid aspect-video place-items-center rounded-md border border-black/10 bg-[var(--theme-mist)] text-sm font-semibold text-black/45">
-              Apercu video
+              Aperçu vidéo
             </div>
           )}
           <label className="inline-flex h-11 w-fit cursor-pointer items-center gap-2 rounded-md border border-black/15 px-4 text-sm font-black">
             <input type="file" accept="video/*" onChange={onUpload} className="sr-only" />
             <Upload size={18} />
-            {isUploading ? "Upload..." : "Uploader une video"}
+            {isUploading ? "Upload..." : "Uploader une vidéo"}
           </label>
           <div className="flex flex-wrap gap-2">
             <button
@@ -1021,7 +1021,7 @@ function OrdersPanel({
                       <p className="font-black">Client</p>
                       <p>{order.customer.email || "Email non renseigne"}</p>
                       <p>{order.customer.city || "Ville non renseignee"}</p>
-                      <p>{order.customer.address || "Adresse non renseignee"}</p>
+                      <p>{order.customer.address || "Adresse non renseignée"}</p>
                       {order.customer.message ? <p>Message: {order.customer.message}</p> : null}
                     </div>
                     <div className="rounded-md bg-[var(--theme-mist)] p-3 text-sm leading-6">

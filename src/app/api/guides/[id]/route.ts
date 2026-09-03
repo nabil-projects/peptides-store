@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { deleteGuide, updateGuide } from "@/lib/guide-store";
 
@@ -41,5 +41,5 @@ export async function DELETE(_request: Request, context: Context) {
     return NextResponse.json({ message: "Guide introuvable." }, { status: 404 });
   }
 
-  return NextResponse.json({ message: "Guide supprime." });
+  return NextResponse.json({ message: "Guide supprimé." });
 }

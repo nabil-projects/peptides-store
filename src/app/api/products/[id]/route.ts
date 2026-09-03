@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 import { deleteProduct, updateProduct } from "@/lib/product-store";
 
@@ -41,5 +41,5 @@ export async function DELETE(_request: Request, context: Context) {
     return NextResponse.json({ message: "Produit introuvable." }, { status: 404 });
   }
 
-  return NextResponse.json({ message: "Produit supprime." });
+  return NextResponse.json({ message: "Produit supprimé." });
 }

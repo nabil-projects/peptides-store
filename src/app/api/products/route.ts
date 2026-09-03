@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { createProduct, getProducts } from "@/lib/product-store";
 import { isAdminAuthenticated } from "@/lib/admin-auth";
 
