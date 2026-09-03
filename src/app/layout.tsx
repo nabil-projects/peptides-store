@@ -16,7 +16,10 @@ export const metadata: Metadata = {
   title: "BIP HORIZON - Boutique",
   description: "Boutique BIP HORIZON avec catalogue et contact direct.",
   icons: {
-    icon: "/icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" },
+    ],
     apple: "/apple-icon.png",
   },
 };
