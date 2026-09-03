@@ -42,8 +42,6 @@ const copy = {
     navCart: "Panier",
     navTerms: "Conditions",
     adminLogin: "Connexion admin",
-    cartArticle: "article",
-    cartArticles: "articles",
     trust: [
       "Livraison suivie",
       "Contact WhatsApp",
@@ -118,8 +116,6 @@ const copy = {
     navCart: "Cart",
     navTerms: "Terms",
     adminLogin: "Admin login",
-    cartArticle: "item",
-    cartArticles: "items",
     trust: [
       "Tracked delivery",
       "WhatsApp contact",
@@ -538,8 +534,7 @@ export default function Home() {
               className="inline-flex h-11 items-center gap-2 rounded-md bg-[var(--theme-accent-dark)] px-4 text-sm font-bold text-white transition hover:bg-[var(--theme-deep)]"
             >
               <ShoppingBag size={18} />
-              {cartItems.length}{" "}
-              {cartItems.length > 1 ? text.cartArticles : text.cartArticle}
+              {cartItems.length}
             </a>
             <button
               type="button"
